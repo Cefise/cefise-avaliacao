@@ -1,0 +1,405 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Cefise Academy — Sistema de Avaliação</title>
+<link rel="icon" href="public/logo.png">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/dist/tabler-icons.min.css">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<!-- LOGIN -->
+<div id="screen-login" class="login-screen">
+  <div class="login-box">
+    <img src="public/logo.png" alt="Cefise Academy" class="login-logo">
+    <h1 class="login-title">Sistema de Avaliação</h1>
+    <p class="login-sub">Acesse com suas credenciais</p>
+    <div id="login-error" class="alert alert-danger" style="display:none"></div>
+    <div class="form-group">
+      <label>E-mail</label>
+      <input type="email" id="login-email" placeholder="seu@email.com" autocomplete="email">
+    </div>
+    <div class="form-group">
+      <label>Senha</label>
+      <input type="password" id="login-password" placeholder="••••••••" autocomplete="current-password">
+    </div>
+    <button class="btn btn-primary btn-full" onclick="doLogin()">
+      <i class="ti ti-login"></i> Entrar
+    </button>
+    <p class="login-hint">Primeiro acesso? Peça ao administrador para criar sua conta.</p>
+  </div>
+</div>
+
+<!-- APP -->
+<div id="screen-app" class="app" style="display:none">
+  <aside class="sidebar">
+    <div class="sidebar-logo">
+      <img src="public/logo.png" alt="Cefise Academy" style="height:36px;object-fit:contain">
+    </div>
+    <nav class="sidebar-nav">
+      <span class="nav-section">Principal</span>
+      <button class="nav-btn active" data-page="dashboard" onclick="showPage('dashboard')">
+        <i class="ti ti-layout-dashboard"></i> Dashboard
+      </button>
+      <button class="nav-btn" data-page="pacientes" onclick="showPage('pacientes')">
+        <i class="ti ti-users"></i> Pacientes
+      </button>
+      <button class="nav-btn" data-page="avaliacao" onclick="showPage('avaliacao')">
+        <i class="ti ti-clipboard-list"></i> Nova avaliação
+      </button>
+      <span class="nav-section">Relatórios</span>
+      <button class="nav-btn" data-page="relatorio" onclick="showPage('relatorio')">
+        <i class="ti ti-chart-bar"></i> Gráficos & PDF
+      </button>
+      <span class="nav-section" id="admin-section" style="display:none">Administração</span>
+      <button class="nav-btn" id="admin-btn" data-page="profissionais" onclick="showPage('profissionais')" style="display:none">
+        <i class="ti ti-stethoscope"></i> Profissionais
+      </button>
+    </nav>
+    <div class="sidebar-user">
+      <div class="user-avatar" id="sidebar-avatar">?</div>
+      <div class="user-info">
+        <div class="user-name" id="sidebar-name">Carregando...</div>
+        <div class="user-role" id="sidebar-role">—</div>
+      </div>
+      <button class="btn-icon" onclick="doLogout()" title="Sair"><i class="ti ti-logout"></i></button>
+    </div>
+  </aside>
+
+  <main class="main">
+    <header class="topbar">
+      <h1 class="topbar-title" id="page-title">Dashboard</h1>
+      <div class="topbar-actions">
+        <button class="btn btn-primary btn-sm" onclick="showPage('avaliacao')">
+          <i class="ti ti-plus"></i> Nova avaliação
+        </button>
+      </div>
+    </header>
+
+    <div class="content">
+
+      <!-- DASHBOARD -->
+      <div class="page active" id="page-dashboard">
+        <div class="stats-grid">
+          <div class="stat-card"><div class="stat-val" id="st-pacientes">—</div><div class="stat-lbl">Pacientes</div></div>
+          <div class="stat-card"><div class="stat-val" id="st-avals">—</div><div class="stat-lbl">Avaliações</div></div>
+          <div class="stat-card"><div class="stat-val" id="st-reavals">—</div><div class="stat-lbl">Reavaliações</div></div>
+          <div class="stat-card"><div class="stat-val" id="st-profs">—</div><div class="stat-lbl">Profissionais</div></div>
+        </div>
+        <div class="grid-2">
+          <div class="card">
+            <div class="card-title"><i class="ti ti-users"></i> Últimos pacientes</div>
+            <div id="dash-recent"></div>
+          </div>
+          <div class="card">
+            <div class="card-title"><i class="ti ti-chart-pie"></i> Avaliações por profissional</div>
+            <div class="chart-wrap" style="height:220px">
+              <canvas id="chart-dash-prof" role="img" aria-label="Avaliações por profissional"></canvas>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- PACIENTES -->
+      <div class="page" id="page-pacientes">
+        <div class="toolbar">
+          <div class="search-bar">
+            <i class="ti ti-search"></i>
+            <input type="text" placeholder="Buscar paciente..." id="search-input" oninput="filterPatients(this.value)">
+          </div>
+          <button class="btn btn-outline btn-sm" onclick="showPage('avaliacao')"><i class="ti ti-plus"></i> Novo paciente</button>
+        </div>
+        <div id="patient-list"></div>
+      </div>
+
+      <!-- AVALIAÇÃO -->
+      <div class="page" id="page-avaliacao">
+        <div class="tabs">
+          <button class="tab active" onclick="showTab(0)"><i class="ti ti-user"></i> Identificação</button>
+          <button class="tab" onclick="showTab(1)"><i class="ti ti-clipboard-text"></i> Anamnese</button>
+          <button class="tab" onclick="showTab(2)"><i class="ti ti-test-pipe"></i> Testes especiais</button>
+          <button class="tab" onclick="showTab(3)"><i class="ti ti-barbell"></i> Força</button>
+          <button class="tab" onclick="showTab(4)"><i class="ti ti-run"></i> Estabilidade</button>
+        </div>
+
+        <!-- Tab 0 -->
+        <div class="tab-pane active" id="tp-0">
+          <div class="card">
+            <div class="card-title"><i class="ti ti-user"></i> Dados do paciente</div>
+            <div class="form-row-2">
+              <div class="form-group"><label>Nome completo *</label><input type="text" id="f-nome" placeholder="Nome completo do paciente"></div>
+              <div class="form-group"><label>Data de nascimento</label><input type="date" id="f-nasc"></div>
+            </div>
+            <div class="form-row-3">
+              <div class="form-group"><label>Estatura (m)</label><input type="number" id="f-altura" placeholder="1.70" step="0.01" min="0.5" max="2.5"></div>
+              <div class="form-group"><label>Peso (kg)</label><input type="number" id="f-peso" placeholder="70" step="0.1" min="1" max="300"></div>
+              <div class="form-group"><label>Celular / E-mail</label><input type="text" id="f-contato" placeholder="(49) 9 99999-9999"></div>
+            </div>
+            <div class="form-row-2">
+              <div class="form-group"><label>Data da avaliação</label><input type="date" id="f-data"></div>
+              <div class="form-group"><label>Tipo de avaliação</label>
+                <select id="f-tipo">
+                  <option value="avaliacao">Avaliação inicial</option>
+                  <option value="reavaliacao">Reavaliação</option>
+                </select>
+              </div>
+            </div>
+          </div>
+          <div class="tab-nav-btns"><button class="btn btn-primary" onclick="showTab(1)">Próximo <i class="ti ti-arrow-right"></i></button></div>
+        </div>
+
+        <!-- Tab 1 -->
+        <div class="tab-pane" id="tp-1">
+          <div class="card">
+            <div class="card-title"><i class="ti ti-clipboard-text"></i> Anamnese</div>
+            <div class="anamnese-item">
+              <label class="anamnese-label">Cirurgias anteriores</label>
+              <div class="radio-row">
+                <label><input type="radio" name="cirurgia" value="nao" checked> Não</label>
+                <label><input type="radio" name="cirurgia" value="sim"> Sim</label>
+              </div>
+              <input type="text" id="det-cirurgia" placeholder="Onde e quando?" class="detail-input" style="display:none">
+            </div>
+            <hr class="divider">
+            <div class="anamnese-item">
+              <label class="anamnese-label">HDP — História de doença passada</label>
+              <div class="radio-row">
+                <label><input type="radio" name="hdp" value="nao" checked> Não</label>
+                <label><input type="radio" name="hdp" value="sim"> Sim</label>
+              </div>
+              <input type="text" id="det-hdp" placeholder="Qual?" class="detail-input" style="display:none">
+            </div>
+            <hr class="divider">
+            <div class="anamnese-item">
+              <label class="anamnese-label">HDA — História de doença atual</label>
+              <div class="radio-row">
+                <label><input type="radio" name="hda" value="nao" checked> Não</label>
+                <label><input type="radio" name="hda" value="sim"> Sim</label>
+              </div>
+              <input type="text" id="det-hda" placeholder="Qual?" class="detail-input" style="display:none">
+            </div>
+            <hr class="divider">
+            <div class="anamnese-item">
+              <label class="anamnese-label">Queixa de dor frequente no dia a dia</label>
+              <div class="radio-row">
+                <label><input type="radio" name="dor" value="nao" checked> Não</label>
+                <label><input type="radio" name="dor" value="sim"> Sim</label>
+              </div>
+              <input type="text" id="det-dor" placeholder="Qual?" class="detail-input" style="display:none">
+            </div>
+          </div>
+          <div class="tab-nav-btns">
+            <button class="btn btn-outline" onclick="showTab(0)"><i class="ti ti-arrow-left"></i> Anterior</button>
+            <button class="btn btn-primary" onclick="showTab(2)">Próximo <i class="ti ti-arrow-right"></i></button>
+          </div>
+        </div>
+
+        <!-- Tab 2 -->
+        <div class="tab-pane" id="tp-2">
+          <div class="card">
+            <div class="card-title"><i class="ti ti-test-pipe"></i> Testes especiais</div>
+            <div class="grid-2">
+              <div>
+                <p class="test-label">FABER</p>
+                <table class="t"><tr><th>Lado</th><th>Resultado</th></tr>
+                <tr><td>Direito</td><td><select id="faber-d"><option value="">—</option><option>Positivo</option><option>Negativo</option></select></td></tr>
+                <tr><td>Esquerdo</td><td><select id="faber-e"><option value="">—</option><option>Positivo</option><option>Negativo</option></select></td></tr></table>
+              </div>
+              <div>
+                <p class="test-label">FADIR</p>
+                <table class="t"><tr><th>Lado</th><th>Resultado</th></tr>
+                <tr><td>Direito</td><td><select id="fadir-d"><option value="">—</option><option>Positivo</option><option>Negativo</option></select></td></tr>
+                <tr><td>Esquerdo</td><td><select id="fadir-e"><option value="">—</option><option>Positivo</option><option>Negativo</option></select></td></tr></table>
+              </div>
+              <div>
+                <p class="test-label">Lasègue</p>
+                <table class="t"><tr><th>Lado</th><th>Resultado</th></tr>
+                <tr><td>Direito</td><td><select id="lasegue-d"><option value="">—</option><option>Positivo</option><option>Negativo</option></select></td></tr>
+                <tr><td>Esquerdo</td><td><select id="lasegue-e"><option value="">—</option><option>Positivo</option><option>Negativo</option></select></td></tr></table>
+              </div>
+              <div>
+                <p class="test-label">Slump</p>
+                <table class="t"><tr><th>Lado</th><th>Resultado</th></tr>
+                <tr><td>Direito</td><td><select id="slump-d"><option value="">—</option><option>Positivo</option><option>Negativo</option></select></td></tr>
+                <tr><td>Esquerdo</td><td><select id="slump-e"><option value="">—</option><option>Positivo</option><option>Negativo</option></select></td></tr></table>
+              </div>
+            </div>
+            <hr class="divider">
+            <p class="test-label">Goniometria (se FADIR positivo)</p>
+            <table class="t">
+              <tr><th>Lado</th><th>Rotação interna (°)</th><th>Rotação externa (°)</th></tr>
+              <tr><td>Direita</td><td><input type="number" id="gonio-ri-d" min="0" max="180"></td><td><input type="number" id="gonio-re-d" min="0" max="180"></td></tr>
+              <tr><td>Esquerda</td><td><input type="number" id="gonio-ri-e" min="0" max="180"></td><td><input type="number" id="gonio-re-e" min="0" max="180"></td></tr>
+            </table>
+          </div>
+          <div class="tab-nav-btns">
+            <button class="btn btn-outline" onclick="showTab(1)"><i class="ti ti-arrow-left"></i> Anterior</button>
+            <button class="btn btn-primary" onclick="showTab(3)">Próximo <i class="ti ti-arrow-right"></i></button>
+          </div>
+        </div>
+
+        <!-- Tab 3 -->
+        <div class="tab-pane" id="tp-3">
+          <div class="card">
+            <div class="card-title"><i class="ti ti-barbell"></i> Testes de força — membros inferiores</div>
+            <div class="grid-2">
+              <div>
+                <p class="test-label">Nordic Hamstring Test</p>
+                <table class="t"><tr><th>Bilateral — Repetições</th></tr>
+                <tr><td><input type="number" id="nordic" min="0" placeholder="0"></td></tr></table>
+              </div>
+              <div>
+                <p class="test-label">One-sided Squat Test</p>
+                <table class="t"><tr><th>Direita</th><th>Esquerda</th></tr>
+                <tr><td><input type="number" id="squat-d" min="0" placeholder="0"></td><td><input type="number" id="squat-e" min="0" placeholder="0"></td></tr></table>
+              </div>
+              <div>
+                <p class="test-label">Single Leg Bridge Test</p>
+                <table class="t"><tr><th>Direita</th><th>Esquerda</th></tr>
+                <tr><td><input type="number" id="bridge-d" min="0" placeholder="0"></td><td><input type="number" id="bridge-e" min="0" placeholder="0"></td></tr></table>
+              </div>
+              <div>
+                <p class="test-label">Copenhagen Test</p>
+                <table class="t"><tr><th>Direita</th><th>Esquerda</th></tr>
+                <tr><td><input type="number" id="copenh-d" min="0" placeholder="0"></td><td><input type="number" id="copenh-e" min="0" placeholder="0"></td></tr></table>
+              </div>
+              <div>
+                <p class="test-label">Core Test (segundos)</p>
+                <table class="t"><tr><th>Direito</th><th>Esquerdo</th></tr>
+                <tr><td><input type="number" id="core-d" min="0" placeholder="0"></td><td><input type="number" id="core-e" min="0" placeholder="0"></td></tr></table>
+              </div>
+              <div>
+                <p class="test-label">Step Down Test</p>
+                <table class="t"><tr><th></th><th>VD</th><th>QP</th></tr>
+                <tr><td>Direito</td><td><input type="number" id="step-vd-d" min="0" placeholder="0"></td><td><input type="number" id="step-qp-d" min="0" placeholder="0"></td></tr>
+                <tr><td>Esquerdo</td><td><input type="number" id="step-vd-e" min="0" placeholder="0"></td><td><input type="number" id="step-qp-e" min="0" placeholder="0"></td></tr></table>
+              </div>
+            </div>
+          </div>
+          <div class="tab-nav-btns">
+            <button class="btn btn-outline" onclick="showTab(2)"><i class="ti ti-arrow-left"></i> Anterior</button>
+            <button class="btn btn-primary" onclick="showTab(4)">Próximo <i class="ti ti-arrow-right"></i></button>
+          </div>
+        </div>
+
+        <!-- Tab 4 -->
+        <div class="tab-pane" id="tp-4">
+          <div class="card">
+            <div class="card-title"><i class="ti ti-run"></i> Testes de estabilidade</div>
+            <div class="grid-3">
+              <div>
+                <p class="test-label">Single Hop Test (cm)</p>
+                <table class="t"><tr><th></th><th>Dir</th><th>Esq</th></tr>
+                <tr><td>1ª</td><td><input type="number" id="sht1-d" min="0" oninput="calcAvg('sht')"></td><td><input type="number" id="sht1-e" min="0" oninput="calcAvg('sht')"></td></tr>
+                <tr><td>2ª</td><td><input type="number" id="sht2-d" min="0" oninput="calcAvg('sht')"></td><td><input type="number" id="sht2-e" min="0" oninput="calcAvg('sht')"></td></tr>
+                <tr><td>3ª</td><td><input type="number" id="sht3-d" min="0" oninput="calcAvg('sht')"></td><td><input type="number" id="sht3-e" min="0" oninput="calcAvg('sht')"></td></tr>
+                <tr class="avg-row"><td>Média</td><td id="sht-avg-d">—</td><td id="sht-avg-e">—</td></tr></table>
+              </div>
+              <div>
+                <p class="test-label">Triple Hop Test (cm)</p>
+                <table class="t"><tr><th></th><th>Dir</th><th>Esq</th></tr>
+                <tr><td>1ª</td><td><input type="number" id="tht1-d" min="0" oninput="calcAvg('tht')"></td><td><input type="number" id="tht1-e" min="0" oninput="calcAvg('tht')"></td></tr>
+                <tr><td>2ª</td><td><input type="number" id="tht2-d" min="0" oninput="calcAvg('tht')"></td><td><input type="number" id="tht2-e" min="0" oninput="calcAvg('tht')"></td></tr>
+                <tr><td>3ª</td><td><input type="number" id="tht3-d" min="0" oninput="calcAvg('tht')"></td><td><input type="number" id="tht3-e" min="0" oninput="calcAvg('tht')"></td></tr>
+                <tr class="avg-row"><td>Média</td><td id="tht-avg-d">—</td><td id="tht-avg-e">—</td></tr></table>
+              </div>
+              <div>
+                <p class="test-label">Crossover Hop Test (cm)</p>
+                <table class="t"><tr><th></th><th>Dir</th><th>Esq</th></tr>
+                <tr><td>1ª</td><td><input type="number" id="cot1-d" min="0" oninput="calcAvg('cot')"></td><td><input type="number" id="cot1-e" min="0" oninput="calcAvg('cot')"></td></tr>
+                <tr><td>2ª</td><td><input type="number" id="cot2-d" min="0" oninput="calcAvg('cot')"></td><td><input type="number" id="cot2-e" min="0" oninput="calcAvg('cot')"></td></tr>
+                <tr><td>3ª</td><td><input type="number" id="cot3-d" min="0" oninput="calcAvg('cot')"></td><td><input type="number" id="cot3-e" min="0" oninput="calcAvg('cot')"></td></tr>
+                <tr class="avg-row"><td>Média</td><td id="cot-avg-d">—</td><td id="cot-avg-e">—</td></tr></table>
+              </div>
+            </div>
+            <hr class="divider">
+            <p class="test-label">Lunge Test</p>
+            <table class="t">
+              <tr><th>Lado</th><th>Centímetros</th><th>Ângulo (°)</th></tr>
+              <tr><td>Direita</td><td><input type="number" id="lunge-cm-d" min="0"></td><td><input type="number" id="lunge-ang-d" min="0"></td></tr>
+              <tr><td>Esquerda</td><td><input type="number" id="lunge-cm-e" min="0"></td><td><input type="number" id="lunge-ang-e" min="0"></td></tr>
+            </table>
+          </div>
+          <div class="tab-nav-btns">
+            <button class="btn btn-outline" onclick="showTab(3)"><i class="ti ti-arrow-left"></i> Anterior</button>
+            <button class="btn btn-outline btn-danger" onclick="clearForm()"><i class="ti ti-x"></i> Limpar</button>
+            <button class="btn btn-primary" onclick="salvarAvaliacao()" id="btn-salvar">
+              <i class="ti ti-device-floppy"></i> Salvar avaliação
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- RELATÓRIO -->
+      <div class="page" id="page-relatorio">
+        <div class="card" style="margin-bottom:16px">
+          <div class="card-title"><i class="ti ti-filter"></i> Selecionar paciente</div>
+          <div style="display:flex;gap:12px;align-items:center">
+            <select id="rel-paciente" onchange="loadRelatorio(this.value)" style="flex:1">
+              <option value="">Selecione um paciente...</option>
+            </select>
+            <button class="btn btn-primary btn-sm" onclick="gerarPDF()">
+              <i class="ti ti-file-type-pdf"></i> Exportar PDF
+            </button>
+          </div>
+        </div>
+        <div id="relatorio-content">
+          <div class="empty-state"><i class="ti ti-chart-bar"></i><p>Selecione um paciente para ver o relatório e gráficos</p></div>
+        </div>
+      </div>
+
+      <!-- PROFISSIONAIS (admin only) -->
+      <div class="page" id="page-profissionais">
+        <div style="display:flex;justify-content:flex-end;margin-bottom:16px">
+          <button class="btn btn-primary btn-sm" onclick="showModalProf()"><i class="ti ti-plus"></i> Adicionar profissional</button>
+        </div>
+        <div id="prof-list"></div>
+      </div>
+
+    </div>
+  </main>
+</div>
+
+<!-- Modal novo profissional -->
+<div class="modal-overlay" id="modal-prof" style="display:none" onclick="if(event.target===this)closeModal('modal-prof')">
+  <div class="modal">
+    <div class="modal-header">
+      <h3>Novo profissional</h3>
+      <button class="btn-icon" onclick="closeModal('modal-prof')"><i class="ti ti-x"></i></button>
+    </div>
+    <div class="form-group"><label>Nome completo *</label><input type="text" id="np-nome" placeholder="Dr. Nome Sobrenome"></div>
+    <div class="form-group"><label>Especialidade</label><input type="text" id="np-esp" placeholder="Fisioterapeuta"></div>
+    <div class="form-group"><label>CRF / Registro</label><input type="text" id="np-crf" placeholder="CRF-SC 12345"></div>
+    <div class="form-group"><label>E-mail (para login) *</label><input type="email" id="np-email" placeholder="profissional@cefise.com.br"></div>
+    <div class="form-group"><label>Senha inicial *</label><input type="password" id="np-senha" placeholder="Mínimo 6 caracteres"></div>
+    <div class="form-group">
+      <label>Perfil</label>
+      <select id="np-role">
+        <option value="profissional">Profissional</option>
+        <option value="admin">Administrador</option>
+      </select>
+    </div>
+    <div id="modal-prof-error" class="alert alert-danger" style="display:none"></div>
+    <div class="modal-footer">
+      <button class="btn btn-outline" onclick="closeModal('modal-prof')">Cancelar</button>
+      <button class="btn btn-primary" onclick="saveProfissional()"><i class="ti ti-check"></i> Salvar</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+<div class="loading-overlay" id="loading" style="display:none">
+  <div class="spinner"></div>
+</div>
+
+<script src="supabase-config.js"></script>
+<script src="app.js"></script>
+</body>
+</html>
