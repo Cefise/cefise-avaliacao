@@ -5,4 +5,3 @@ if (!window._supabaseClient) {
   window._supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 }
 const supabase = window._supabaseClient;
-const supabase = window._supabaseClient;
