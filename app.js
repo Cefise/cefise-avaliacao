@@ -19,9 +19,9 @@ function toast(msg, type = 'ok') {
 }
 
 function loading(show) {
-  document.getElementById('loading').style.display = show ? 'flex' : 'none';
+  const el = document.getElementById('loading');
+  if (el) el.style.display = show ? 'flex' : 'none';
 }
-
 function showErr(id, msg) {
   const el = document.getElementById(id);
   if (!el) return;
