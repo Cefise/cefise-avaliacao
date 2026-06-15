@@ -64,13 +64,22 @@ async function doLogin() {
   const pass = document.getElementById('login-password').value;
   showErr('login-error', '');
   if (!email || !pass) { showErr('login-error', 'Preencha e-mail e senha.'); return; }
-  loading(true);
-  const { data, error } = await supabase.auth.signInWithPassword({ email, password: pass });
-  loading(false);
-  if (error) { showErr('login-error', 'E-mail ou senha incorretos.'); return; }
-  currentUser = data.user;
-  await loadProfile();
-  enterApp();
+  const btn = document.querySelector('.btn-full');
+  if (btn) btn.disabled = true;
+  try {
+    const client = window._supabaseClient;
+    if (!client) { showErr('login-error', 'Erro de conexão. Recarregue a página.'); return; }
+    const { data, error } = await client.auth.signInWithPassword({ email, password: pass });
+    if (error) { showErr('login-error', 'E-mail ou senha incorretos.'); return; }
+    currentUser = data.user;
+    await loadProfile();
+    enterApp();
+  } catch(e) {
+    showErr('login-error', 'Erro inesperado. Tente novamente.');
+    console.error(e);
+  } finally {
+    if (btn) btn.disabled = false;
+  }
 }
 
 async function doLogout() {
