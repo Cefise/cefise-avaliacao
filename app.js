@@ -3,6 +3,11 @@
 //  app.js — lógica principal
 // ============================================================
 
+// Inicialização do Supabase
+const SUPABASE_URL = 'https://oooedutvxendobfqiinlj.supabase.co';
+const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im9vZWR1dHZ4ZW5kb2JmcWlpbmxqIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODE1NDg3NjAsImV4cCI6MjA5NzEyNDc2MH0.KSuRBgH3mLDP0zcdl4v6TVvG3Kt_5y6aXOQFDxC8O8E';
+const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
 let currentUser = null;
 let currentProfile = null;
 let relCharts = {};
@@ -19,9 +24,9 @@ function toast(msg, type = 'ok') {
 }
 
 function loading(show) {
-  const el = document.getElementById('loading');
-  if (el) el.style.display = show ? 'flex' : 'none';
+  document.getElementById('loading').style.display = show ? 'flex' : 'none';
 }
+
 function showErr(id, msg) {
   const el = document.getElementById(id);
   if (!el) return;
@@ -64,22 +69,13 @@ async function doLogin() {
   const pass = document.getElementById('login-password').value;
   showErr('login-error', '');
   if (!email || !pass) { showErr('login-error', 'Preencha e-mail e senha.'); return; }
-  const btn = document.querySelector('.btn-full');
-  if (btn) btn.disabled = true;
-  try {
-    const client = window._supabaseClient;
-    if (!client) { showErr('login-error', 'Erro de conexão. Recarregue a página.'); return; }
-    const { data, error } = await client.auth.signInWithPassword({ email, password: pass });
-    if (error) { showErr('login-error', 'E-mail ou senha incorretos.'); return; }
-    currentUser = data.user;
-    await loadProfile();
-    enterApp();
-  } catch(e) {
-    showErr('login-error', 'Erro inesperado. Tente novamente.');
-    console.error(e);
-  } finally {
-    if (btn) btn.disabled = false;
-  }
+  loading(true);
+  const { data, error } = await supabase.auth.signInWithPassword({ email, password: pass });
+  loading(false);
+  if (error) { showErr('login-error', 'E-mail ou senha incorretos.'); return; }
+  currentUser = data.user;
+  await loadProfile();
+  enterApp();
 }
 
 async function doLogout() {
@@ -119,13 +115,16 @@ window.addEventListener('DOMContentLoaded', async () => {
   // Today's date
   document.getElementById('f-data').value = new Date().toISOString().split('T')[0];
 
-  loading(true);
-  const { data: { session } } = await supabase.auth.getSession();
-  loading(false);
-  if (session) {
-    currentUser = session.user;
-    await loadProfile();
-    enterApp();
+  // Verifica sessão sem bloquear a tela de login
+  try {
+    const { data } = await supabase.auth.getSession();
+    if (data && data.session) {
+      currentUser = data.session.user;
+      await loadProfile();
+      enterApp();
+    }
+  } catch (e) {
+    console.error('Erro ao verificar sessão:', e);
   }
 });
 
