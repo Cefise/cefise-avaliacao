@@ -114,18 +114,10 @@ window.addEventListener('DOMContentLoaded', async () => {
   setupRadioToggles();
   // Today's date
   document.getElementById('f-data').value = new Date().toISOString().split('T')[0];
-
-  // Verifica sessão sem bloquear a tela de login
-  try {
-    const { data } = await supabase.auth.getSession();
-    if (data && data.session) {
-      currentUser = data.session.user;
-      await loadProfile();
-      enterApp();
-    }
-  } catch (e) {
-    console.error('Erro ao verificar sessão:', e);
-  }
+  // Entra direto sem login
+  currentUser = { id: 'local', email: 'admin@cefise.com' };
+  currentProfile = { id: 1, nome: 'Administrador', especialidade: 'Fisioterapeuta', role: 'admin' };
+  enterApp();
 });
 
 function setupRadioToggles() {
