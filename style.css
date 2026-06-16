@@ -409,3 +409,16 @@ table.t td input:focus, table.t td select:focus { outline: none; }
   .stats-grid { grid-template-columns: 1fr 1fr; }
   .grid-2, .grid-3, .form-row-2, .form-row-3 { grid-template-columns: 1fr; }
 }
+.check-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 7px 0;
+  font-size: 14px;
+  cursor: pointer;
+  border-bottom: 0.5px solid var(--border, #eee);
+}
+.check-item:last-child { border-bottom: none; }
+.check-item input[type="checkbox"] { width: 16px; height: 16px; cursor: pointer; accent-color: #1D9E75; }
+
+.avg-row td { background: #f5faf5; font-weight: 600; font-size: 13px; }
