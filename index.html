@@ -121,15 +121,19 @@
 
       <!-- AVALIAÇÃO -->
       <div class="page" id="page-avaliacao">
-        <div class="tabs">
+        <div class="tabs" style="flex-wrap:wrap">
           <button class="tab active" onclick="showTab(0)"><i class="ti ti-user"></i> Identificação</button>
           <button class="tab" onclick="showTab(1)"><i class="ti ti-clipboard-text"></i> Anamnese</button>
           <button class="tab" onclick="showTab(2)"><i class="ti ti-test-pipe"></i> Testes especiais</button>
           <button class="tab" onclick="showTab(3)"><i class="ti ti-barbell"></i> Força</button>
           <button class="tab" onclick="showTab(4)"><i class="ti ti-run"></i> Estabilidade</button>
+          <button class="tab" onclick="showTab(5)"><i class="ti ti-ruler-2"></i> Mobilidade</button>
+          <button class="tab" onclick="showTab(6)"><i class="ti ti-activity"></i> Escalas</button>
+          <button class="tab" onclick="showTab(7)"><i class="ti ti-trophy"></i> RTP</button>
+          <button class="tab" onclick="showTab(8)"><i class="ti ti-notes"></i> Notas</button>
         </div>
 
-        <!-- Tab 0 -->
+        <!-- Tab 0 — Identificação -->
         <div class="tab-pane active" id="tp-0">
           <div class="card">
             <div class="card-title"><i class="ti ti-user"></i> Dados do paciente</div>
@@ -142,7 +146,7 @@
               <div class="form-group"><label>Peso (kg)</label><input type="number" id="f-peso" placeholder="70" step="0.1" min="1" max="300"></div>
               <div class="form-group"><label>Celular / E-mail</label><input type="text" id="f-contato" placeholder="(49) 9 99999-9999"></div>
             </div>
-            <div class="form-row-2">
+            <div class="form-row-3">
               <div class="form-group"><label>Data da avaliação</label><input type="date" id="f-data"></div>
               <div class="form-group"><label>Tipo de avaliação</label>
                 <select id="f-tipo">
@@ -150,12 +154,17 @@
                   <option value="reavaliacao">Reavaliação</option>
                 </select>
               </div>
+              <div class="form-group"><label>Semana pós-cirurgia / lesão</label><input type="number" id="f-semana" placeholder="Ex: 12" min="0" max="200"></div>
+            </div>
+            <div class="form-group">
+              <label>Modalidade / Esporte</label>
+              <input type="text" id="f-esporte" placeholder="Ex: Futebol, Corrida, Musculação...">
             </div>
           </div>
           <div class="tab-nav-btns"><button class="btn btn-primary" onclick="showTab(1)">Próximo <i class="ti ti-arrow-right"></i></button></div>
         </div>
 
-        <!-- Tab 1 -->
+        <!-- Tab 1 — Anamnese -->
         <div class="tab-pane" id="tp-1">
           <div class="card">
             <div class="card-title"><i class="ti ti-clipboard-text"></i> Anamnese</div>
@@ -194,6 +203,18 @@
               </div>
               <input type="text" id="det-dor" placeholder="Qual?" class="detail-input" style="display:none">
             </div>
+            <hr class="divider">
+            <!-- EVA -->
+            <div class="anamnese-item">
+              <label class="anamnese-label">EVA — Escala Visual Analógica de dor (0 = sem dor, 10 = pior dor)</label>
+              <div style="display:flex;align-items:center;gap:16px;margin-top:8px">
+                <input type="range" id="eva-valor" min="0" max="10" value="0" step="1" style="flex:1" oninput="document.getElementById('eva-display').textContent=this.value">
+                <span id="eva-display" style="font-size:22px;font-weight:600;min-width:32px;text-align:center">0</span>
+              </div>
+              <div style="display:flex;justify-content:space-between;font-size:11px;color:#888;margin-top:2px">
+                <span>Sem dor</span><span>Pior dor imaginável</span>
+              </div>
+            </div>
           </div>
           <div class="tab-nav-btns">
             <button class="btn btn-outline" onclick="showTab(0)"><i class="ti ti-arrow-left"></i> Anterior</button>
@@ -201,10 +222,10 @@
           </div>
         </div>
 
-        <!-- Tab 2 -->
+        <!-- Tab 2 — Testes especiais -->
         <div class="tab-pane" id="tp-2">
           <div class="card">
-            <div class="card-title"><i class="ti ti-test-pipe"></i> Testes especiais</div>
+            <div class="card-title"><i class="ti ti-test-pipe"></i> Testes especiais — Quadril / Coluna</div>
             <div class="grid-2">
               <div>
                 <p class="test-label">FABER</p>
@@ -230,6 +251,21 @@
                 <tr><td>Direito</td><td><select id="slump-d"><option value="">—</option><option>Positivo</option><option>Negativo</option></select></td></tr>
                 <tr><td>Esquerdo</td><td><select id="slump-e"><option value="">—</option><option>Positivo</option><option>Negativo</option></select></td></tr></table>
               </div>
+              <!-- Teste de Thomas -->
+              <div>
+                <p class="test-label">Teste de Thomas</p>
+                <table class="t"><tr><th>Lado</th><th>Resultado</th></tr>
+                <tr><td>Direito</td><td><select id="thomas-d"><option value="">—</option><option>Positivo</option><option>Negativo</option></select></td></tr>
+                <tr><td>Esquerdo</td><td><select id="thomas-e"><option value="">—</option><option>Positivo</option><option>Negativo</option></select></td></tr></table>
+                <input type="text" id="thomas-obs" placeholder="Observações (iliopsoas, reto femoral, TFL...)" class="detail-input" style="display:block;margin-top:4px">
+              </div>
+              <!-- Teste de Ober -->
+              <div>
+                <p class="test-label">Teste de Ober (banda iliotibial)</p>
+                <table class="t"><tr><th>Lado</th><th>Resultado</th></tr>
+                <tr><td>Direito</td><td><select id="ober-d"><option value="">—</option><option>Positivo</option><option>Negativo</option></select></td></tr>
+                <tr><td>Esquerdo</td><td><select id="ober-e"><option value="">—</option><option>Positivo</option><option>Negativo</option></select></td></tr></table>
+              </div>
             </div>
             <hr class="divider">
             <p class="test-label">Goniometria (se FADIR positivo)</p>
@@ -238,6 +274,81 @@
               <tr><td>Direita</td><td><input type="number" id="gonio-ri-d" min="0" max="180"></td><td><input type="number" id="gonio-re-d" min="0" max="180"></td></tr>
               <tr><td>Esquerda</td><td><input type="number" id="gonio-ri-e" min="0" max="180"></td><td><input type="number" id="gonio-re-e" min="0" max="180"></td></tr>
             </table>
+            <hr class="divider">
+            <div class="card-title" style="margin-top:8px"><i class="ti ti-arm"></i> Testes especiais — Joelho</div>
+            <div class="grid-2">
+              <div>
+                <p class="test-label">Dial Test</p>
+                <table class="t"><tr><th>Lado</th><th>30°</th><th>90°</th></tr>
+                <tr><td>Direito</td><td><select id="dial-30-d"><option value="">—</option><option>Positivo</option><option>Negativo</option></select></td><td><select id="dial-90-d"><option value="">—</option><option>Positivo</option><option>Negativo</option></select></td></tr>
+                <tr><td>Esquerdo</td><td><select id="dial-30-e"><option value="">—</option><option>Positivo</option><option>Negativo</option></select></td><td><select id="dial-90-e"><option value="">—</option><option>Positivo</option><option>Negativo</option></select></td></tr></table>
+              </div>
+              <div>
+                <p class="test-label">Pivot Shift</p>
+                <table class="t"><tr><th>Lado</th><th>Resultado</th></tr>
+                <tr><td>Direito</td><td><select id="pivot-d"><option value="">—</option><option>Positivo</option><option>Negativo</option></select></td></tr>
+                <tr><td>Esquerdo</td><td><select id="pivot-e"><option value="">—</option><option>Positivo</option><option>Negativo</option></select></td></tr></table>
+              </div>
+            </div>
+            <hr class="divider">
+            <div class="card-title" style="margin-top:8px"><i class="ti ti-arm"></i> Testes especiais — Ombro</div>
+            <div class="grid-2">
+              <div>
+                <p class="test-label">Hawkins-Kennedy</p>
+                <table class="t"><tr><th>Lado</th><th>Resultado</th></tr>
+                <tr><td>Direito</td><td><select id="hawkins-d"><option value="">—</option><option>Positivo</option><option>Negativo</option></select></td></tr>
+                <tr><td>Esquerdo</td><td><select id="hawkins-e"><option value="">—</option><option>Positivo</option><option>Negativo</option></select></td></tr></table>
+              </div>
+              <div>
+                <p class="test-label">Neer</p>
+                <table class="t"><tr><th>Lado</th><th>Resultado</th></tr>
+                <tr><td>Direito</td><td><select id="neer-d"><option value="">—</option><option>Positivo</option><option>Negativo</option></select></td></tr>
+                <tr><td>Esquerdo</td><td><select id="neer-e"><option value="">—</option><option>Positivo</option><option>Negativo</option></select></td></tr></table>
+              </div>
+              <div>
+                <p class="test-label">Apprehension Test</p>
+                <table class="t"><tr><th>Lado</th><th>Resultado</th></tr>
+                <tr><td>Direito</td><td><select id="appr-d"><option value="">—</option><option>Positivo</option><option>Negativo</option></select></td></tr>
+                <tr><td>Esquerdo</td><td><select id="appr-e"><option value="">—</option><option>Positivo</option><option>Negativo</option></select></td></tr></table>
+              </div>
+              <div>
+                <p class="test-label">Relocation Test</p>
+                <table class="t"><tr><th>Lado</th><th>Resultado</th></tr>
+                <tr><td>Direito</td><td><select id="reloc-d"><option value="">—</option><option>Positivo</option><option>Negativo</option></select></td></tr>
+                <tr><td>Esquerdo</td><td><select id="reloc-e"><option value="">—</option><option>Positivo</option><option>Negativo</option></select></td></tr></table>
+              </div>
+              <div>
+                <p class="test-label">Apley (mobilidade de ombro)</p>
+                <table class="t"><tr><th>Lado</th><th>Resultado</th></tr>
+                <tr><td>Direito</td><td><select id="apley-d"><option value="">—</option><option>Normal</option><option>Limitado</option></select></td></tr>
+                <tr><td>Esquerdo</td><td><select id="apley-e"><option value="">—</option><option>Normal</option><option>Limitado</option></select></td></tr></table>
+              </div>
+            </div>
+            <hr class="divider">
+            <div class="card-title" style="margin-top:8px"><i class="ti ti-walk"></i> Testes especiais — Tornozelo</div>
+            <div class="grid-2">
+              <div>
+                <p class="test-label">Talar Tilt</p>
+                <table class="t"><tr><th>Lado</th><th>Resultado</th></tr>
+                <tr><td>Direito</td><td><select id="talar-d"><option value="">—</option><option>Positivo</option><option>Negativo</option></select></td></tr>
+                <tr><td>Esquerdo</td><td><select id="talar-e"><option value="">—</option><option>Positivo</option><option>Negativo</option></select></td></tr></table>
+              </div>
+              <div>
+                <p class="test-label">Gaveta anterior (tornozelo)</p>
+                <table class="t"><tr><th>Lado</th><th>Resultado</th></tr>
+                <tr><td>Direito</td><td><select id="gaveta-d"><option value="">—</option><option>Positivo</option><option>Negativo</option></select></td></tr>
+                <tr><td>Esquerdo</td><td><select id="gaveta-e"><option value="">—</option><option>Positivo</option><option>Negativo</option></select></td></tr></table>
+              </div>
+            </div>
+            <hr class="divider">
+            <div class="card-title" style="margin-top:8px"><i class="ti ti-spine"></i> Coluna</div>
+            <div class="grid-2">
+              <div>
+                <p class="test-label">Teste de Schober (mobilidade lombar)</p>
+                <table class="t"><tr><th>Distância em flexão (cm)</th></tr>
+                <tr><td><input type="number" id="schober" min="0" max="30" step="0.1" placeholder="Normal ≥ 5 cm"></td></tr></table>
+              </div>
+            </div>
           </div>
           <div class="tab-nav-btns">
             <button class="btn btn-outline" onclick="showTab(1)"><i class="ti ti-arrow-left"></i> Anterior</button>
@@ -245,7 +356,7 @@
           </div>
         </div>
 
-        <!-- Tab 3 -->
+        <!-- Tab 3 — Força -->
         <div class="tab-pane" id="tp-3">
           <div class="card">
             <div class="card-title"><i class="ti ti-barbell"></i> Testes de força — membros inferiores</div>
@@ -289,10 +400,10 @@
           </div>
         </div>
 
-        <!-- Tab 4 -->
+        <!-- Tab 4 — Estabilidade -->
         <div class="tab-pane" id="tp-4">
           <div class="card">
-            <div class="card-title"><i class="ti ti-run"></i> Testes de estabilidade</div>
+            <div class="card-title"><i class="ti ti-run"></i> Testes de estabilidade / hop tests</div>
             <div class="grid-3">
               <div>
                 <p class="test-label">Single Hop Test (cm)</p>
@@ -300,7 +411,8 @@
                 <tr><td>1ª</td><td><input type="number" id="sht1-d" min="0" oninput="calcAvg('sht')"></td><td><input type="number" id="sht1-e" min="0" oninput="calcAvg('sht')"></td></tr>
                 <tr><td>2ª</td><td><input type="number" id="sht2-d" min="0" oninput="calcAvg('sht')"></td><td><input type="number" id="sht2-e" min="0" oninput="calcAvg('sht')"></td></tr>
                 <tr><td>3ª</td><td><input type="number" id="sht3-d" min="0" oninput="calcAvg('sht')"></td><td><input type="number" id="sht3-e" min="0" oninput="calcAvg('sht')"></td></tr>
-                <tr class="avg-row"><td>Média</td><td id="sht-avg-d">—</td><td id="sht-avg-e">—</td></tr></table>
+                <tr class="avg-row"><td>Média</td><td id="sht-avg-d">—</td><td id="sht-avg-e">—</td></tr>
+                <tr class="avg-row"><td>LSI %</td><td colspan="2" id="sht-lsi">—</td></tr></table>
               </div>
               <div>
                 <p class="test-label">Triple Hop Test (cm)</p>
@@ -308,7 +420,8 @@
                 <tr><td>1ª</td><td><input type="number" id="tht1-d" min="0" oninput="calcAvg('tht')"></td><td><input type="number" id="tht1-e" min="0" oninput="calcAvg('tht')"></td></tr>
                 <tr><td>2ª</td><td><input type="number" id="tht2-d" min="0" oninput="calcAvg('tht')"></td><td><input type="number" id="tht2-e" min="0" oninput="calcAvg('tht')"></td></tr>
                 <tr><td>3ª</td><td><input type="number" id="tht3-d" min="0" oninput="calcAvg('tht')"></td><td><input type="number" id="tht3-e" min="0" oninput="calcAvg('tht')"></td></tr>
-                <tr class="avg-row"><td>Média</td><td id="tht-avg-d">—</td><td id="tht-avg-e">—</td></tr></table>
+                <tr class="avg-row"><td>Média</td><td id="tht-avg-d">—</td><td id="tht-avg-e">—</td></tr>
+                <tr class="avg-row"><td>LSI %</td><td colspan="2" id="tht-lsi">—</td></tr></table>
               </div>
               <div>
                 <p class="test-label">Crossover Hop Test (cm)</p>
@@ -316,7 +429,43 @@
                 <tr><td>1ª</td><td><input type="number" id="cot1-d" min="0" oninput="calcAvg('cot')"></td><td><input type="number" id="cot1-e" min="0" oninput="calcAvg('cot')"></td></tr>
                 <tr><td>2ª</td><td><input type="number" id="cot2-d" min="0" oninput="calcAvg('cot')"></td><td><input type="number" id="cot2-e" min="0" oninput="calcAvg('cot')"></td></tr>
                 <tr><td>3ª</td><td><input type="number" id="cot3-d" min="0" oninput="calcAvg('cot')"></td><td><input type="number" id="cot3-e" min="0" oninput="calcAvg('cot')"></td></tr>
-                <tr class="avg-row"><td>Média</td><td id="cot-avg-d">—</td><td id="cot-avg-e">—</td></tr></table>
+                <tr class="avg-row"><td>Média</td><td id="cot-avg-d">—</td><td id="cot-avg-e">—</td></tr>
+                <tr class="avg-row"><td>LSI %</td><td colspan="2" id="cot-lsi">—</td></tr></table>
+              </div>
+            </div>
+            <hr class="divider">
+            <div class="grid-2">
+              <div>
+                <p class="test-label">Side Hop Test (repetições em 30s)</p>
+                <table class="t"><tr><th>Direito</th><th>Esquerdo</th></tr>
+                <tr><td><input type="number" id="sidehop-d" min="0" oninput="calcLSI('sidehop')"></td>
+                    <td><input type="number" id="sidehop-e" min="0" oninput="calcLSI('sidehop')"></td></tr>
+                <tr class="avg-row"><td>LSI %</td><td id="sidehop-lsi">—</td></tr></table>
+              </div>
+              <div>
+                <p class="test-label">CMJ — Countermovement Jump (cm)</p>
+                <table class="t"><tr><th>Tentativa 1</th><th>Tentativa 2</th><th>Tentativa 3</th><th>Melhor</th></tr>
+                <tr>
+                  <td><input type="number" id="cmj1" min="0" oninput="calcBest('cmj')"></td>
+                  <td><input type="number" id="cmj2" min="0" oninput="calcBest('cmj')"></td>
+                  <td><input type="number" id="cmj3" min="0" oninput="calcBest('cmj')"></td>
+                  <td id="cmj-best">—</td>
+                </tr></table>
+              </div>
+              <div>
+                <p class="test-label">Drop Jump — Índice de reatividade (RSI)</p>
+                <table class="t"><tr><th>Altura queda (cm)</th><th>Altura salto (cm)</th><th>RSI</th></tr>
+                <tr>
+                  <td><input type="number" id="dj-queda" min="0" step="0.1" oninput="calcRSI()"></td>
+                  <td><input type="number" id="dj-salto" min="0" step="0.1" oninput="calcRSI()"></td>
+                  <td id="dj-rsi">—</td>
+                </tr></table>
+              </div>
+              <div>
+                <p class="test-label">Tuck Jump Assessment (score 0–10)</p>
+                <table class="t"><tr><th>Critérios cumpridos</th><th>Score</th></tr>
+                <tr><td><input type="number" id="tuckjump" min="0" max="10" placeholder="0–10"></td>
+                    <td id="tuckjump-score">—</td></tr></table>
               </div>
             </div>
             <hr class="divider">
@@ -329,6 +478,259 @@
           </div>
           <div class="tab-nav-btns">
             <button class="btn btn-outline" onclick="showTab(3)"><i class="ti ti-arrow-left"></i> Anterior</button>
+            <button class="btn btn-primary" onclick="showTab(5)">Próximo <i class="ti ti-arrow-right"></i></button>
+          </div>
+        </div>
+
+        <!-- Tab 5 — Mobilidade -->
+        <div class="tab-pane" id="tp-5">
+          <div class="card">
+            <div class="card-title"><i class="ti ti-ruler-2"></i> Mobilidade e postura</div>
+
+            <!-- FMS -->
+            <p class="test-label">FMS — Functional Movement Screen (0–3 por padrão)</p>
+            <table class="t">
+              <tr><th>Padrão</th><th>Dir</th><th>Esq</th><th>Score</th></tr>
+              <tr><td>Deep Squat</td><td colspan="2"><input type="number" id="fms-dsquat" min="0" max="3" oninput="calcFMS()"></td><td id="fms-dsquat-s">—</td></tr>
+              <tr><td>Hurdle Step</td><td><input type="number" id="fms-hurdle-d" min="0" max="3" oninput="calcFMS()"></td><td><input type="number" id="fms-hurdle-e" min="0" max="3" oninput="calcFMS()"></td><td id="fms-hurdle-s">—</td></tr>
+              <tr><td>Inline Lunge</td><td><input type="number" id="fms-lunge-d" min="0" max="3" oninput="calcFMS()"></td><td><input type="number" id="fms-lunge-e" min="0" max="3" oninput="calcFMS()"></td><td id="fms-lunge-s">—</td></tr>
+              <tr><td>Shoulder Mobility</td><td><input type="number" id="fms-shoulder-d" min="0" max="3" oninput="calcFMS()"></td><td><input type="number" id="fms-shoulder-e" min="0" max="3" oninput="calcFMS()"></td><td id="fms-shoulder-s">—</td></tr>
+              <tr><td>Active Straight Leg Raise</td><td><input type="number" id="fms-aslr-d" min="0" max="3" oninput="calcFMS()"></td><td><input type="number" id="fms-aslr-e" min="0" max="3" oninput="calcFMS()"></td><td id="fms-aslr-s">—</td></tr>
+              <tr><td>Trunk Stability Push-up</td><td colspan="2"><input type="number" id="fms-trunk" min="0" max="3" oninput="calcFMS()"></td><td id="fms-trunk-s">—</td></tr>
+              <tr><td>Rotary Stability</td><td><input type="number" id="fms-rot-d" min="0" max="3" oninput="calcFMS()"></td><td><input type="number" id="fms-rot-e" min="0" max="3" oninput="calcFMS()"></td><td id="fms-rot-s">—</td></tr>
+              <tr class="avg-row"><td colspan="3"><strong>Total FMS</strong></td><td id="fms-total">—</td></tr>
+            </table>
+
+            <hr class="divider">
+
+            <!-- Dorsiflexão -->
+            <p class="test-label">Dorsiflexão weight-bearing (distância pé-parede em cm)</p>
+            <table class="t">
+              <tr><th>Lado</th><th>Tentativa 1</th><th>Tentativa 2</th><th>Tentativa 3</th><th>Melhor</th></tr>
+              <tr><td>Direito</td>
+                  <td><input type="number" id="dors-d1" min="0" step="0.1" oninput="calcBestDors('d')"></td>
+                  <td><input type="number" id="dors-d2" min="0" step="0.1" oninput="calcBestDors('d')"></td>
+                  <td><input type="number" id="dors-d3" min="0" step="0.1" oninput="calcBestDors('d')"></td>
+                  <td id="dors-best-d">—</td></tr>
+              <tr><td>Esquerdo</td>
+                  <td><input type="number" id="dors-e1" min="0" step="0.1" oninput="calcBestDors('e')"></td>
+                  <td><input type="number" id="dors-e2" min="0" step="0.1" oninput="calcBestDors('e')"></td>
+                  <td><input type="number" id="dors-e3" min="0" step="0.1" oninput="calcBestDors('e')"></td>
+                  <td id="dors-best-e">—</td></tr>
+              <tr class="avg-row"><td colspan="4">LSI %</td><td id="dors-lsi">—</td></tr>
+            </table>
+
+            <hr class="divider">
+
+            <!-- SLS / Y-Balance -->
+            <p class="test-label">SLS / Y-Balance Test (cm)</p>
+            <table class="t">
+              <tr><th>Direção</th><th>Direito</th><th>Esquerdo</th></tr>
+              <tr><td>Anterior</td><td><input type="number" id="ybal-ant-d" min="0" step="0.1"></td><td><input type="number" id="ybal-ant-e" min="0" step="0.1"></td></tr>
+              <tr><td>Póstero-medial</td><td><input type="number" id="ybal-pm-d" min="0" step="0.1"></td><td><input type="number" id="ybal-pm-e" min="0" step="0.1"></td></tr>
+              <tr><td>Póstero-lateral</td><td><input type="number" id="ybal-pl-d" min="0" step="0.1"></td><td><input type="number" id="ybal-pl-e" min="0" step="0.1"></td></tr>
+            </table>
+
+            <hr class="divider">
+
+            <!-- Agachamento overhead -->
+            <p class="test-label">Agachamento overhead — checklist qualitativo</p>
+            <div class="grid-2" style="margin-top:8px">
+              <label class="check-item"><input type="checkbox" id="aho-joelho"> Joelhos em valgo</label>
+              <label class="check-item"><input type="checkbox" id="aho-calcanhar"> Calcanhares se elevam</label>
+              <label class="check-item"><input type="checkbox" id="aho-tronco"> Inclinação excessiva do tronco</label>
+              <label class="check-item"><input type="checkbox" id="aho-ombros"> Ombros caem à frente</label>
+              <label class="check-item"><input type="checkbox" id="aho-pelve"> Desvio lateral da pelve</label>
+              <label class="check-item"><input type="checkbox" id="aho-coluna"> Flexão lombar excessiva</label>
+            </div>
+            <div class="form-group" style="margin-top:8px">
+              <label>Observações</label>
+              <input type="text" id="aho-obs" placeholder="Observações adicionais do agachamento...">
+            </div>
+          </div>
+          <div class="tab-nav-btns">
+            <button class="btn btn-outline" onclick="showTab(4)"><i class="ti ti-arrow-left"></i> Anterior</button>
+            <button class="btn btn-primary" onclick="showTab(6)">Próximo <i class="ti ti-arrow-right"></i></button>
+          </div>
+        </div>
+
+        <!-- Tab 6 — Escalas funcionais -->
+        <div class="tab-pane" id="tp-6">
+          <div class="card">
+            <div class="card-title"><i class="ti ti-activity"></i> Escalas de função e qualidade de vida</div>
+            <p style="font-size:13px;color:#888;margin-bottom:16px">Preencha somente as escalas aplicáveis ao caso. Deixe em branco as que não se aplicam.</p>
+
+            <!-- KOOS -->
+            <p class="test-label">KOOS — Knee Injury & Osteoarthritis Outcome Score (0–100 por subescala)</p>
+            <table class="t">
+              <tr><th>Subescala</th><th>Score (0–100)</th></tr>
+              <tr><td>Sintomas</td><td><input type="number" id="koos-sint" min="0" max="100" step="0.1"></td></tr>
+              <tr><td>Dor</td><td><input type="number" id="koos-dor" min="0" max="100" step="0.1"></td></tr>
+              <tr><td>Atividades de vida diária (AVD)</td><td><input type="number" id="koos-avd" min="0" max="100" step="0.1"></td></tr>
+              <tr><td>Esporte / Recreação</td><td><input type="number" id="koos-esporte" min="0" max="100" step="0.1"></td></tr>
+              <tr><td>Qualidade de vida</td><td><input type="number" id="koos-qv" min="0" max="100" step="0.1"></td></tr>
+            </table>
+
+            <hr class="divider">
+
+            <!-- IKDC -->
+            <p class="test-label">IKDC Subjetivo — International Knee Documentation Committee (0–100)</p>
+            <table class="t">
+              <tr><th>Score IKDC</th></tr>
+              <tr><td><input type="number" id="ikdc" min="0" max="100" step="0.1" placeholder="0–100"></td></tr>
+            </table>
+
+            <hr class="divider">
+
+            <!-- HOOS -->
+            <p class="test-label">HOOS — Hip disability & Osteoarthritis Outcome Score (0–100 por subescala)</p>
+            <table class="t">
+              <tr><th>Subescala</th><th>Score (0–100)</th></tr>
+              <tr><td>Sintomas</td><td><input type="number" id="hoos-sint" min="0" max="100" step="0.1"></td></tr>
+              <tr><td>Dor</td><td><input type="number" id="hoos-dor" min="0" max="100" step="0.1"></td></tr>
+              <tr><td>AVD</td><td><input type="number" id="hoos-avd" min="0" max="100" step="0.1"></td></tr>
+              <tr><td>Esporte / Recreação</td><td><input type="number" id="hoos-esporte" min="0" max="100" step="0.1"></td></tr>
+              <tr><td>Qualidade de vida</td><td><input type="number" id="hoos-qv" min="0" max="100" step="0.1"></td></tr>
+            </table>
+
+            <hr class="divider">
+
+            <!-- ODI -->
+            <p class="test-label">ODI — Oswestry Disability Index (0–100%)</p>
+            <table class="t">
+              <tr><th>Score ODI (%)</th><th>Classificação</th></tr>
+              <tr><td><input type="number" id="odi" min="0" max="100" step="0.1" placeholder="0–100" oninput="classifyODI()"></td>
+                  <td id="odi-class">—</td></tr>
+            </table>
+
+            <hr class="divider">
+
+            <!-- DASH -->
+            <p class="test-label">DASH / QuickDASH — Disabilities of Arm, Shoulder and Hand (0–100)</p>
+            <table class="t">
+              <tr><th>Tipo</th><th>Score (0–100)</th></tr>
+              <tr><td>DASH completo</td><td><input type="number" id="dash" min="0" max="100" step="0.1"></td></tr>
+              <tr><td>QuickDASH</td><td><input type="number" id="quickdash" min="0" max="100" step="0.1"></td></tr>
+            </table>
+
+            <hr class="divider">
+
+            <!-- VISA-P / VISA-A -->
+            <p class="test-label">VISA — Victorian Institute Score (0–100)</p>
+            <table class="t">
+              <tr><th>Escala</th><th>Score (0–100)</th></tr>
+              <tr><td>VISA-P (tendinopatia patelar)</td><td><input type="number" id="visap" min="0" max="100" step="0.1"></td></tr>
+              <tr><td>VISA-A (tendinopatia aquiliana)</td><td><input type="number" id="visaa" min="0" max="100" step="0.1"></td></tr>
+            </table>
+
+            <hr class="divider">
+
+            <!-- FAAM -->
+            <p class="test-label">FAAM — Foot and Ankle Ability Measure (0–100)</p>
+            <table class="t">
+              <tr><th>Subescala</th><th>Score (0–100)</th></tr>
+              <tr><td>Atividades de vida diária</td><td><input type="number" id="faam-avd" min="0" max="100" step="0.1"></td></tr>
+              <tr><td>Esporte</td><td><input type="number" id="faam-esp" min="0" max="100" step="0.1"></td></tr>
+            </table>
+          </div>
+          <div class="tab-nav-btns">
+            <button class="btn btn-outline" onclick="showTab(5)"><i class="ti ti-arrow-left"></i> Anterior</button>
+            <button class="btn btn-primary" onclick="showTab(7)">Próximo <i class="ti ti-arrow-right"></i></button>
+          </div>
+        </div>
+
+        <!-- Tab 7 — RTP -->
+        <div class="tab-pane" id="tp-7">
+          <div class="card">
+            <div class="card-title"><i class="ti ti-trophy"></i> Critérios de retorno esportivo (RTP)</div>
+
+            <!-- ACL-RSI -->
+            <p class="test-label">ACL-RSI — Prontidão psicológica (0–100)</p>
+            <table class="t">
+              <tr><th>Score ACL-RSI (média das 12 questões × 10)</th></tr>
+              <tr><td><input type="number" id="aclrsi" min="0" max="100" step="0.1" placeholder="0–100" oninput="classifyRSI()"></td></tr>
+              <tr class="avg-row"><td id="aclrsi-class">—</td></tr>
+            </table>
+
+            <hr class="divider">
+
+            <!-- Checklist RTP -->
+            <p class="test-label">Checklist de critérios objetivos para RTP</p>
+            <div style="margin-top:8px">
+              <label class="check-item"><input type="checkbox" id="rtp-lsi"> LSI ≥ 90% em todos os hop tests</label>
+              <label class="check-item"><input type="checkbox" id="rtp-forca"> Força ≥ 90% (isocinético ou testes funcionais)</label>
+              <label class="check-item"><input type="checkbox" id="rtp-dor"> Sem dor aos esforços (EVA = 0)</label>
+              <label class="check-item"><input type="checkbox" id="rtp-edema"> Sem edema articular</label>
+              <label class="check-item"><input type="checkbox" id="rtp-psico"> ACL-RSI ≥ 65 pontos</label>
+              <label class="check-item"><input type="checkbox" id="rtp-tempo"> Mínimo 9 meses pós-cirurgia de LCA</label>
+              <label class="check-item"><input type="checkbox" id="rtp-agilidade"> Testes de agilidade satisfatórios</label>
+              <label class="check-item"><input type="checkbox" id="rtp-treino"> Tolerância ao treino específico da modalidade</label>
+            </div>
+
+            <div style="margin-top:12px;padding:12px;background:#f0faf5;border-radius:8px;border-left:3px solid #1D9E75">
+              <div style="font-size:13px;color:#555;margin-bottom:4px">Critérios cumpridos</div>
+              <div id="rtp-progresso" style="font-size:22px;font-weight:600;color:#1D9E75">0 / 8</div>
+            </div>
+
+            <hr class="divider">
+
+            <div class="form-group">
+              <label>Decisão clínica de RTP</label>
+              <select id="rtp-decisao">
+                <option value="">— Selecione —</option>
+                <option value="liberado">Liberado para retorno esportivo</option>
+                <option value="condicionado">Liberado com restrições</option>
+                <option value="nao_liberado">Não liberado</option>
+                <option value="em_progresso">Em progresso</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label>Data prevista de RTP</label>
+              <input type="date" id="rtp-data">
+            </div>
+          </div>
+          <div class="tab-nav-btns">
+            <button class="btn btn-outline" onclick="showTab(6)"><i class="ti ti-arrow-left"></i> Anterior</button>
+            <button class="btn btn-primary" onclick="showTab(8)">Próximo <i class="ti ti-arrow-right"></i></button>
+          </div>
+        </div>
+
+        <!-- Tab 8 — Notas e arquivos -->
+        <div class="tab-pane" id="tp-8">
+          <div class="card">
+            <div class="card-title"><i class="ti ti-notes"></i> Observações clínicas e arquivos</div>
+            <div class="form-group">
+              <label>Notas — Anamnese / Identificação</label>
+              <textarea id="nota-anamnese" rows="3" placeholder="Observações sobre a anamnese e dados do paciente..."></textarea>
+            </div>
+            <div class="form-group">
+              <label>Notas — Testes especiais</label>
+              <textarea id="nota-testes" rows="3" placeholder="Observações sobre os testes especiais realizados..."></textarea>
+            </div>
+            <div class="form-group">
+              <label>Notas — Força e estabilidade</label>
+              <textarea id="nota-forca" rows="3" placeholder="Observações sobre força, estabilidade e hop tests..."></textarea>
+            </div>
+            <div class="form-group">
+              <label>Notas — Mobilidade e postura</label>
+              <textarea id="nota-mobilidade" rows="3" placeholder="Observações sobre FMS, mobilidade e postura..."></textarea>
+            </div>
+            <div class="form-group">
+              <label>Notas — RTP / Evolução</label>
+              <textarea id="nota-rtp" rows="3" placeholder="Evolução clínica, critérios de RTP, plano de progressão..."></textarea>
+            </div>
+            <hr class="divider">
+            <div class="form-group">
+              <label>Link de vídeo (execução de movimento)</label>
+              <input type="url" id="link-video" placeholder="https://drive.google.com/... ou https://youtube.com/...">
+            </div>
+            <div class="form-group">
+              <label>Link de imagem / foto</label>
+              <input type="url" id="link-foto" placeholder="https://...">
+            </div>
+          </div>
+          <div class="tab-nav-btns">
+            <button class="btn btn-outline" onclick="showTab(7)"><i class="ti ti-arrow-left"></i> Anterior</button>
             <button class="btn btn-outline btn-danger" onclick="clearForm()"><i class="ti ti-x"></i> Limpar</button>
             <button class="btn btn-primary" onclick="salvarAvaliacao()" id="btn-salvar">
               <i class="ti ti-device-floppy"></i> Salvar avaliação
