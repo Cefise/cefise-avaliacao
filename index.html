@@ -554,36 +554,37 @@
           </div>
         </div>
 
-        <!-- Tab 6 — Escalas funcionais -->
+        <!-- Tab 6 — Escalas funcionais COMPLETAS -->
         <div class="tab-pane" id="tp-6">
-          <div class="card">
-            <div class="card-title"><i class="ti ti-activity"></i> Escalas de função e qualidade de vida</div>
-            <p style="font-size:13px;color:#888;margin-bottom:16px">Preencha somente as escalas aplicáveis ao caso. Deixe em branco as que não se aplicam.</p>
+          <p style="font-size:13px;color:#888;margin:0 0 12px">Preencha somente as escalas aplicáveis ao caso. O score é calculado automaticamente ao preencher as questões.</p>
 
-            <!-- KOOS -->
-            <p class="test-label">KOOS — Knee Injury & Osteoarthritis Outcome Score (0–100 por subescala)</p>
+          <!-- ── KOOS (score manual) ── -->
+          <div class="card" style="margin-bottom:14px">
+            <div class="card-title"><i class="ti ti-activity"></i> KOOS — Knee Injury &amp; Osteoarthritis Outcome Score</div>
+            <p style="font-size:12px;color:#888;margin-bottom:8px">Insira os scores de cada subescala (0–100). Aplicar somente para lesões de joelho.</p>
             <table class="t">
               <tr><th>Subescala</th><th>Score (0–100)</th></tr>
               <tr><td>Sintomas</td><td><input type="number" id="koos-sint" min="0" max="100" step="0.1"></td></tr>
               <tr><td>Dor</td><td><input type="number" id="koos-dor" min="0" max="100" step="0.1"></td></tr>
-              <tr><td>Atividades de vida diária (AVD)</td><td><input type="number" id="koos-avd" min="0" max="100" step="0.1"></td></tr>
+              <tr><td>AVD</td><td><input type="number" id="koos-avd" min="0" max="100" step="0.1"></td></tr>
               <tr><td>Esporte / Recreação</td><td><input type="number" id="koos-esporte" min="0" max="100" step="0.1"></td></tr>
               <tr><td>Qualidade de vida</td><td><input type="number" id="koos-qv" min="0" max="100" step="0.1"></td></tr>
             </table>
+          </div>
 
-            <hr class="divider">
-
-            <!-- IKDC -->
-            <p class="test-label">IKDC Subjetivo — International Knee Documentation Committee (0–100)</p>
+          <!-- ── IKDC ── -->
+          <div class="card" style="margin-bottom:14px">
+            <div class="card-title"><i class="ti ti-activity"></i> IKDC — International Knee Documentation Committee</div>
+            <p style="font-size:12px;color:#888;margin-bottom:8px">Score subjetivo 0–100 (calculado externamente ou pelo profissional).</p>
             <table class="t">
-              <tr><th>Score IKDC</th></tr>
+              <tr><th>Score IKDC (0–100)</th></tr>
               <tr><td><input type="number" id="ikdc" min="0" max="100" step="0.1" placeholder="0–100"></td></tr>
             </table>
+          </div>
 
-            <hr class="divider">
-
-            <!-- HOOS -->
-            <p class="test-label">HOOS — Hip disability & Osteoarthritis Outcome Score (0–100 por subescala)</p>
+          <!-- ── HOOS ── -->
+          <div class="card" style="margin-bottom:14px">
+            <div class="card-title"><i class="ti ti-activity"></i> HOOS — Hip disability &amp; Osteoarthritis Outcome Score</div>
             <table class="t">
               <tr><th>Subescala</th><th>Score (0–100)</th></tr>
               <tr><td>Sintomas</td><td><input type="number" id="hoos-sint" min="0" max="100" step="0.1"></td></tr>
@@ -592,47 +593,473 @@
               <tr><td>Esporte / Recreação</td><td><input type="number" id="hoos-esporte" min="0" max="100" step="0.1"></td></tr>
               <tr><td>Qualidade de vida</td><td><input type="number" id="hoos-qv" min="0" max="100" step="0.1"></td></tr>
             </table>
+          </div>
 
-            <hr class="divider">
-
-            <!-- ODI -->
-            <p class="test-label">ODI — Oswestry Disability Index (0–100%)</p>
-            <table class="t">
-              <tr><th>Score ODI (%)</th><th>Classificação</th></tr>
-              <tr><td><input type="number" id="odi" min="0" max="100" step="0.1" placeholder="0–100" oninput="classifyODI()"></td>
-                  <td id="odi-class">—</td></tr>
-            </table>
-
-            <hr class="divider">
-
-            <!-- DASH -->
-            <p class="test-label">DASH / QuickDASH — Disabilities of Arm, Shoulder and Hand (0–100)</p>
-            <table class="t">
-              <tr><th>Tipo</th><th>Score (0–100)</th></tr>
-              <tr><td>DASH completo</td><td><input type="number" id="dash" min="0" max="100" step="0.1"></td></tr>
-              <tr><td>QuickDASH</td><td><input type="number" id="quickdash" min="0" max="100" step="0.1"></td></tr>
-            </table>
-
-            <hr class="divider">
-
-            <!-- VISA-P / VISA-A -->
-            <p class="test-label">VISA — Victorian Institute Score (0–100)</p>
-            <table class="t">
-              <tr><th>Escala</th><th>Score (0–100)</th></tr>
-              <tr><td>VISA-P (tendinopatia patelar)</td><td><input type="number" id="visap" min="0" max="100" step="0.1"></td></tr>
-              <tr><td>VISA-A (tendinopatia aquiliana)</td><td><input type="number" id="visaa" min="0" max="100" step="0.1"></td></tr>
-            </table>
-
-            <hr class="divider">
-
-            <!-- FAAM -->
-            <p class="test-label">FAAM — Foot and Ankle Ability Measure (0–100)</p>
+          <!-- ── FAAM ── -->
+          <div class="card" style="margin-bottom:14px">
+            <div class="card-title"><i class="ti ti-activity"></i> FAAM — Foot and Ankle Ability Measure</div>
             <table class="t">
               <tr><th>Subescala</th><th>Score (0–100)</th></tr>
-              <tr><td>Atividades de vida diária</td><td><input type="number" id="faam-avd" min="0" max="100" step="0.1"></td></tr>
+              <tr><td>AVD</td><td><input type="number" id="faam-avd" min="0" max="100" step="0.1"></td></tr>
               <tr><td>Esporte</td><td><input type="number" id="faam-esp" min="0" max="100" step="0.1"></td></tr>
             </table>
           </div>
+
+          <!-- ══════════════════════════════════════════════════════ -->
+          <!-- DASH COMPLETO — 30 questões -->
+          <!-- ══════════════════════════════════════════════════════ -->
+          <div class="card" style="margin-bottom:14px">
+            <div class="card-title"><i class="ti ti-arm"></i> DASH — Disabilities of the Arm, Shoulder and Hand</div>
+            <p style="font-size:12px;color:#888;margin-bottom:10px">30 questões · escala 1–5 · mínimo 27 respostas. Score calculado automaticamente.</p>
+            <div class="escala-resultado" id="dash-resultado">Score: —</div>
+            <div style="font-size:12px;color:#888;margin-bottom:10px" id="dash-class"></div>
+
+            <div class="q-group">
+              <div class="q-group-title">Habilidade para atividades (1 = sem dificuldade · 5 = não conseguiu)</div>
+              <div class="q-list" id="dash-qs">
+                <div class="q-item" data-qid="dash-q1"><span class="q-num">1</span><span class="q-text">Abrir um vidro novo ou com a tampa muito apertada</span><div class="q-opts" data-name="dash-q1"></div></div>
+                <div class="q-item" data-qid="dash-q2"><span class="q-num">2</span><span class="q-text">Escrever</span><div class="q-opts" data-name="dash-q2"></div></div>
+                <div class="q-item" data-qid="dash-q3"><span class="q-num">3</span><span class="q-text">Virar uma chave</span><div class="q-opts" data-name="dash-q3"></div></div>
+                <div class="q-item" data-qid="dash-q4"><span class="q-num">4</span><span class="q-text">Preparar uma refeição</span><div class="q-opts" data-name="dash-q4"></div></div>
+                <div class="q-item" data-qid="dash-q5"><span class="q-num">5</span><span class="q-text">Abrir uma porta pesada</span><div class="q-opts" data-name="dash-q5"></div></div>
+                <div class="q-item" data-qid="dash-q6"><span class="q-num">6</span><span class="q-text">Colocar algo em uma prateleira acima da cabeça</span><div class="q-opts" data-name="dash-q6"></div></div>
+                <div class="q-item" data-qid="dash-q7"><span class="q-num">7</span><span class="q-text">Tarefas domésticas pesadas (lavar paredes, lavar o chão)</span><div class="q-opts" data-name="dash-q7"></div></div>
+                <div class="q-item" data-qid="dash-q8"><span class="q-num">8</span><span class="q-text">Fazer trabalho de jardinagem</span><div class="q-opts" data-name="dash-q8"></div></div>
+                <div class="q-item" data-qid="dash-q9"><span class="q-num">9</span><span class="q-text">Arrumar a cama</span><div class="q-opts" data-name="dash-q9"></div></div>
+                <div class="q-item" data-qid="dash-q10"><span class="q-num">10</span><span class="q-text">Carregar uma sacola ou maleta</span><div class="q-opts" data-name="dash-q10"></div></div>
+                <div class="q-item" data-qid="dash-q11"><span class="q-num">11</span><span class="q-text">Carregar um objeto pesado (mais de 5 kg)</span><div class="q-opts" data-name="dash-q11"></div></div>
+                <div class="q-item" data-qid="dash-q12"><span class="q-num">12</span><span class="q-text">Trocar uma lâmpada acima da cabeça</span><div class="q-opts" data-name="dash-q12"></div></div>
+                <div class="q-item" data-qid="dash-q13"><span class="q-num">13</span><span class="q-text">Lavar ou secar o cabelo</span><div class="q-opts" data-name="dash-q13"></div></div>
+                <div class="q-item" data-qid="dash-q14"><span class="q-num">14</span><span class="q-text">Lavar suas costas</span><div class="q-opts" data-name="dash-q14"></div></div>
+                <div class="q-item" data-qid="dash-q15"><span class="q-num">15</span><span class="q-text">Vestir uma blusa fechada</span><div class="q-opts" data-name="dash-q15"></div></div>
+                <div class="q-item" data-qid="dash-q16"><span class="q-num">16</span><span class="q-text">Usar uma faca para cortar alimentos</span><div class="q-opts" data-name="dash-q16"></div></div>
+                <div class="q-item" data-qid="dash-q17"><span class="q-num">17</span><span class="q-text">Atividades recreativas com pouco esforço (cartas, tricô)</span><div class="q-opts" data-name="dash-q17"></div></div>
+                <div class="q-item" data-qid="dash-q18"><span class="q-num">18</span><span class="q-text">Atividades recreativas com força ou impacto (vôlei, martelar)</span><div class="q-opts" data-name="dash-q18"></div></div>
+                <div class="q-item" data-qid="dash-q19"><span class="q-num">19</span><span class="q-text">Atividades recreativas movendo o braço livremente (pescar, peteca)</span><div class="q-opts" data-name="dash-q19"></div></div>
+                <div class="q-item" data-qid="dash-q20"><span class="q-num">20</span><span class="q-text">Transportar-se de um lugar a outro</span><div class="q-opts" data-name="dash-q20"></div></div>
+                <div class="q-item" data-qid="dash-q21"><span class="q-num">21</span><span class="q-text">Atividades sexuais</span><div class="q-opts" data-name="dash-q21"></div></div>
+              </div>
+            </div>
+            <div class="q-group" style="margin-top:10px">
+              <div class="q-group-title">Impacto social e sintomas (1 = não afetou · 5 = afetou extremamente)</div>
+              <div class="q-list">
+                <div class="q-item" data-qid="dash-q22"><span class="q-num">22</span><span class="q-text">Impacto nas atividades com família, amigos, vizinhos</span><div class="q-opts" data-name="dash-q22"></div></div>
+                <div class="q-item" data-qid="dash-q23"><span class="q-num">23</span><span class="q-text">Limitação no trabalho ou atividades diárias normais</span><div class="q-opts" data-name="dash-q23"></div></div>
+              </div>
+            </div>
+            <div class="q-group" style="margin-top:10px">
+              <div class="q-group-title">Gravidade dos sintomas (1 = nenhuma · 5 = extrema)</div>
+              <div class="q-list">
+                <div class="q-item" data-qid="dash-q24"><span class="q-num">24</span><span class="q-text">Dor no braço, ombro ou mão</span><div class="q-opts" data-name="dash-q24"></div></div>
+                <div class="q-item" data-qid="dash-q25"><span class="q-num">25</span><span class="q-text">Dor durante atividades específicas</span><div class="q-opts" data-name="dash-q25"></div></div>
+                <div class="q-item" data-qid="dash-q26"><span class="q-num">26</span><span class="q-text">Desconforto / alfinetadas no braço, ombro ou mão</span><div class="q-opts" data-name="dash-q26"></div></div>
+                <div class="q-item" data-qid="dash-q27"><span class="q-num">27</span><span class="q-text">Fraqueza no braço, ombro ou mão</span><div class="q-opts" data-name="dash-q27"></div></div>
+                <div class="q-item" data-qid="dash-q28"><span class="q-num">28</span><span class="q-text">Dificuldade em mover braço, ombro ou mão</span><div class="q-opts" data-name="dash-q28"></div></div>
+                <div class="q-item" data-qid="dash-q29"><span class="q-num">29</span><span class="q-text">Dificuldade para dormir por causa da dor</span><div class="q-opts" data-name="dash-q29"></div></div>
+                <div class="q-item" data-qid="dash-q30"><span class="q-num">30</span><span class="q-text">Sinto-me menos capaz por causa do meu problema no braço/ombro/mão</span><div class="q-opts" data-name="dash-q30"></div></div>
+              </div>
+            </div>
+            <!-- Score manual (campo oculto sincronizado) -->
+            <input type="hidden" id="dash">
+            <input type="hidden" id="quickdash">
+          </div>
+
+          <!-- ══════════════════════════════════════════════════════ -->
+          <!-- ODI COMPLETO — 10 seções -->
+          <!-- ══════════════════════════════════════════════════════ -->
+          <div class="card" style="margin-bottom:14px">
+            <div class="card-title"><i class="ti ti-spine"></i> ODI — Oswestry Disability Index (lombalgia)</div>
+            <p style="font-size:12px;color:#888;margin-bottom:10px">10 seções · 0–5 pts cada · score em %. Calculado automaticamente.</p>
+            <div class="escala-resultado" id="odi-resultado">Score: —</div>
+            <div style="font-size:12px;color:#888;margin-bottom:10px" id="odi-class"></div>
+
+            <div class="q-list">
+              <div class="q-item q-item-block" data-qid="odi-s1">
+                <div class="q-text-block"><span class="q-num">1</span> Intensidade da dor</div>
+                <div class="q-opts-block" data-name="odi-s1">
+                  <label class="q-radio-lbl"><input type="radio" name="odi-s1" value="0"> Sem dor no momento</label>
+                  <label class="q-radio-lbl"><input type="radio" name="odi-s1" value="1"> Dor leve</label>
+                  <label class="q-radio-lbl"><input type="radio" name="odi-s1" value="2"> Dor moderada</label>
+                  <label class="q-radio-lbl"><input type="radio" name="odi-s1" value="3"> Dor mais ou menos intensa</label>
+                  <label class="q-radio-lbl"><input type="radio" name="odi-s1" value="4"> Dor muito forte</label>
+                  <label class="q-radio-lbl"><input type="radio" name="odi-s1" value="5"> Pior dor imaginável</label>
+                </div>
+              </div>
+              <div class="q-item q-item-block" data-qid="odi-s2">
+                <div class="q-text-block"><span class="q-num">2</span> Cuidados pessoais</div>
+                <div class="q-opts-block" data-name="odi-s2">
+                  <label class="q-radio-lbl"><input type="radio" name="odi-s2" value="0"> Cuido de mim sem dor extra</label>
+                  <label class="q-radio-lbl"><input type="radio" name="odi-s2" value="1"> Cuido de mim, mas me causa dor</label>
+                  <label class="q-radio-lbl"><input type="radio" name="odi-s2" value="2"> É doloroso, sou lento e cuidadoso</label>
+                  <label class="q-radio-lbl"><input type="radio" name="odi-s2" value="3"> Preciso de alguma ajuda</label>
+                  <label class="q-radio-lbl"><input type="radio" name="odi-s2" value="4"> Preciso de ajuda em todos os aspectos</label>
+                  <label class="q-radio-lbl"><input type="radio" name="odi-s2" value="5"> Não me visto / fico na cama</label>
+                </div>
+              </div>
+              <div class="q-item q-item-block" data-qid="odi-s3">
+                <div class="q-text-block"><span class="q-num">3</span> Pesos</div>
+                <div class="q-opts-block" data-name="odi-s3">
+                  <label class="q-radio-lbl"><input type="radio" name="odi-s3" value="0"> Levanto peso sem dor extra</label>
+                  <label class="q-radio-lbl"><input type="radio" name="odi-s3" value="1"> Levanto peso pesado com dor extra</label>
+                  <label class="q-radio-lbl"><input type="radio" name="odi-s3" value="2"> Não levanto do chão, mas consigo de mesa</label>
+                  <label class="q-radio-lbl"><input type="radio" name="odi-s3" value="3"> Levanto apenas coisas leves bem posicionadas</label>
+                  <label class="q-radio-lbl"><input type="radio" name="odi-s3" value="4"> Só levanto coisas muito leves</label>
+                  <label class="q-radio-lbl"><input type="radio" name="odi-s3" value="5"> Não posso levantar nem carregar nada</label>
+                </div>
+              </div>
+              <div class="q-item q-item-block" data-qid="odi-s4">
+                <div class="q-text-block"><span class="q-num">4</span> Andar</div>
+                <div class="q-opts-block" data-name="odi-s4">
+                  <label class="q-radio-lbl"><input type="radio" name="odi-s4" value="0"> Qualquer distância sem dor</label>
+                  <label class="q-radio-lbl"><input type="radio" name="odi-s4" value="1"> Impede de andar mais que 2 km</label>
+                  <label class="q-radio-lbl"><input type="radio" name="odi-s4" value="2"> Impede de andar mais que 500 m</label>
+                  <label class="q-radio-lbl"><input type="radio" name="odi-s4" value="3"> Impede de andar mais que poucos metros</label>
+                  <label class="q-radio-lbl"><input type="radio" name="odi-s4" value="4"> Só ando com bengala ou muleta</label>
+                  <label class="q-radio-lbl"><input type="radio" name="odi-s4" value="5"> Fico na cama a maior parte do tempo</label>
+                </div>
+              </div>
+              <div class="q-item q-item-block" data-qid="odi-s5">
+                <div class="q-text-block"><span class="q-num">5</span> Sentar</div>
+                <div class="q-opts-block" data-name="odi-s5">
+                  <label class="q-radio-lbl"><input type="radio" name="odi-s5" value="0"> Qualquer cadeira pelo tempo que quiser</label>
+                  <label class="q-radio-lbl"><input type="radio" name="odi-s5" value="1"> Minha cadeira favorita pelo tempo que quiser</label>
+                  <label class="q-radio-lbl"><input type="radio" name="odi-s5" value="2"> Impede de sentar mais de 1 hora</label>
+                  <label class="q-radio-lbl"><input type="radio" name="odi-s5" value="3"> Impede de sentar mais de 30 min</label>
+                  <label class="q-radio-lbl"><input type="radio" name="odi-s5" value="4"> Impede de sentar mais de 10 min</label>
+                  <label class="q-radio-lbl"><input type="radio" name="odi-s5" value="5"> Impede de sentar</label>
+                </div>
+              </div>
+              <div class="q-item q-item-block" data-qid="odi-s6">
+                <div class="q-text-block"><span class="q-num">6</span> De pé</div>
+                <div class="q-opts-block" data-name="odi-s6">
+                  <label class="q-radio-lbl"><input type="radio" name="odi-s6" value="0"> Fico de pé pelo tempo que quiser sem dor</label>
+                  <label class="q-radio-lbl"><input type="radio" name="odi-s6" value="1"> Fico de pé, mas sinto um pouco de dor</label>
+                  <label class="q-radio-lbl"><input type="radio" name="odi-s6" value="2"> Impede de ficar de pé mais de 1 hora</label>
+                  <label class="q-radio-lbl"><input type="radio" name="odi-s6" value="3"> Impede de ficar de pé mais de 30 min</label>
+                  <label class="q-radio-lbl"><input type="radio" name="odi-s6" value="4"> Impede de ficar de pé mais de 10 min</label>
+                  <label class="q-radio-lbl"><input type="radio" name="odi-s6" value="5"> Impede de ficar de pé</label>
+                </div>
+              </div>
+              <div class="q-item q-item-block" data-qid="odi-s7">
+                <div class="q-text-block"><span class="q-num">7</span> Sono</div>
+                <div class="q-opts-block" data-name="odi-s7">
+                  <label class="q-radio-lbl"><input type="radio" name="odi-s7" value="0"> Sono não perturbado por dor</label>
+                  <label class="q-radio-lbl"><input type="radio" name="odi-s7" value="1"> Às vezes perturbado por dor</label>
+                  <label class="q-radio-lbl"><input type="radio" name="odi-s7" value="2"> Durmo menos de 6 h por causa da dor</label>
+                  <label class="q-radio-lbl"><input type="radio" name="odi-s7" value="3"> Durmo menos de 4 h por causa da dor</label>
+                  <label class="q-radio-lbl"><input type="radio" name="odi-s7" value="4"> Durmo menos de 2 h por causa da dor</label>
+                  <label class="q-radio-lbl"><input type="radio" name="odi-s7" value="5"> Dor me impede de dormir</label>
+                </div>
+              </div>
+              <div class="q-item q-item-block" data-qid="odi-s8">
+                <div class="q-text-block"><span class="q-num">8</span> Vida sexual (se aplicável)</div>
+                <div class="q-opts-block" data-name="odi-s8">
+                  <label class="q-radio-lbl"><input type="radio" name="odi-s8" value="0"> Normal e sem dor extra</label>
+                  <label class="q-radio-lbl"><input type="radio" name="odi-s8" value="1"> Normal, mas causa dor extra</label>
+                  <label class="q-radio-lbl"><input type="radio" name="odi-s8" value="2"> Quase normal, mas muito dolorosa</label>
+                  <label class="q-radio-lbl"><input type="radio" name="odi-s8" value="3"> Muito restringida pela dor</label>
+                  <label class="q-radio-lbl"><input type="radio" name="odi-s8" value="4"> Praticamente inexistente</label>
+                  <label class="q-radio-lbl"><input type="radio" name="odi-s8" value="5"> Dor me impede de ter atividade sexual</label>
+                </div>
+              </div>
+              <div class="q-item q-item-block" data-qid="odi-s9">
+                <div class="q-text-block"><span class="q-num">9</span> Vida social</div>
+                <div class="q-opts-block" data-name="odi-s9">
+                  <label class="q-radio-lbl"><input type="radio" name="odi-s9" value="0"> Normal e sem dor extra</label>
+                  <label class="q-radio-lbl"><input type="radio" name="odi-s9" value="1"> Normal, mas aumenta a dor</label>
+                  <label class="q-radio-lbl"><input type="radio" name="odi-s9" value="2"> Não altera, exceto por impedir esportes</label>
+                  <label class="q-radio-lbl"><input type="radio" name="odi-s9" value="3"> Restringiu — não saio muito de casa</label>
+                  <label class="q-radio-lbl"><input type="radio" name="odi-s9" value="4"> Restringiu à minha casa</label>
+                  <label class="q-radio-lbl"><input type="radio" name="odi-s9" value="5"> Não tenho vida social devido à dor</label>
+                </div>
+              </div>
+              <div class="q-item q-item-block" data-qid="odi-s10">
+                <div class="q-text-block"><span class="q-num">10</span> Viagens</div>
+                <div class="q-opts-block" data-name="odi-s10">
+                  <label class="q-radio-lbl"><input type="radio" name="odi-s10" value="0"> Viajo para qualquer lugar sem dor</label>
+                  <label class="q-radio-lbl"><input type="radio" name="odi-s10" value="1"> Viajo para qualquer lugar, mas com dor</label>
+                  <label class="q-radio-lbl"><input type="radio" name="odi-s10" value="2"> Dor ruim, mas aguento 2 horas</label>
+                  <label class="q-radio-lbl"><input type="radio" name="odi-s10" value="3"> Restringe para menos de 1 hora</label>
+                  <label class="q-radio-lbl"><input type="radio" name="odi-s10" value="4"> Restringe para necessárias e menos de 30 min</label>
+                  <label class="q-radio-lbl"><input type="radio" name="odi-s10" value="5"> Impede de viajar, exceto para tratamento</label>
+                </div>
+              </div>
+            </div>
+            <input type="hidden" id="odi">
+          </div>
+
+          <!-- ══════════════════════════════════════════════════════ -->
+          <!-- NDI — Neck Disability Index -->
+          <!-- ══════════════════════════════════════════════════════ -->
+          <div class="card" style="margin-bottom:14px">
+            <div class="card-title"><i class="ti ti-spine"></i> NDI — Neck Disability Index (cervicalgia)</div>
+            <p style="font-size:12px;color:#888;margin-bottom:10px">10 seções · 0–5 pts cada · score em %. Calculado automaticamente.</p>
+            <div class="escala-resultado" id="ndi-resultado">Score: —</div>
+            <div style="font-size:12px;color:#888;margin-bottom:10px" id="ndi-class"></div>
+
+            <div class="q-list">
+              <div class="q-item q-item-block"><div class="q-text-block"><span class="q-num">1</span> Intensidade da dor</div>
+                <div class="q-opts-block" data-name="ndi-s1">
+                  <label class="q-radio-lbl"><input type="radio" name="ndi-s1" value="0"> Sem dor no momento</label>
+                  <label class="q-radio-lbl"><input type="radio" name="ndi-s1" value="1"> Dor muito leve</label>
+                  <label class="q-radio-lbl"><input type="radio" name="ndi-s1" value="2"> Dor moderada</label>
+                  <label class="q-radio-lbl"><input type="radio" name="ndi-s1" value="3"> Dor bastante intensa</label>
+                  <label class="q-radio-lbl"><input type="radio" name="ndi-s1" value="4"> Dor muito intensa</label>
+                  <label class="q-radio-lbl"><input type="radio" name="ndi-s1" value="5"> Pior dor imaginável</label>
+                </div>
+              </div>
+              <div class="q-item q-item-block"><div class="q-text-block"><span class="q-num">2</span> Cuidados pessoais</div>
+                <div class="q-opts-block" data-name="ndi-s2">
+                  <label class="q-radio-lbl"><input type="radio" name="ndi-s2" value="0"> Cuido de mim normalmente sem dor extra</label>
+                  <label class="q-radio-lbl"><input type="radio" name="ndi-s2" value="1"> Cuido de mim, mas causa dor extra</label>
+                  <label class="q-radio-lbl"><input type="radio" name="ndi-s2" value="2"> É doloroso, sou lento e cuidadoso</label>
+                  <label class="q-radio-lbl"><input type="radio" name="ndi-s2" value="3"> Preciso de alguma ajuda</label>
+                  <label class="q-radio-lbl"><input type="radio" name="ndi-s2" value="4"> Preciso de ajuda diária na maioria dos aspectos</label>
+                  <label class="q-radio-lbl"><input type="radio" name="ndi-s2" value="5"> Não me visto / fico na cama</label>
+                </div>
+              </div>
+              <div class="q-item q-item-block"><div class="q-text-block"><span class="q-num">3</span> Levantar peso</div>
+                <div class="q-opts-block" data-name="ndi-s3">
+                  <label class="q-radio-lbl"><input type="radio" name="ndi-s3" value="0"> Levanto peso sem dor extra</label>
+                  <label class="q-radio-lbl"><input type="radio" name="ndi-s3" value="1"> Levanto peso pesado, mas com dor extra</label>
+                  <label class="q-radio-lbl"><input type="radio" name="ndi-s3" value="2"> Não do chão, mas consigo de mesa</label>
+                  <label class="q-radio-lbl"><input type="radio" name="ndi-s3" value="3"> Apenas coisas leves bem posicionadas</label>
+                  <label class="q-radio-lbl"><input type="radio" name="ndi-s3" value="4"> Apenas coisas muito leves</label>
+                  <label class="q-radio-lbl"><input type="radio" name="ndi-s3" value="5"> Não posso levantar nem carregar nada</label>
+                </div>
+              </div>
+              <div class="q-item q-item-block"><div class="q-text-block"><span class="q-num">4</span> Trabalho</div>
+                <div class="q-opts-block" data-name="ndi-s4">
+                  <label class="q-radio-lbl"><input type="radio" name="ndi-s4" value="0"> Trabalho tanto quanto quero</label>
+                  <label class="q-radio-lbl"><input type="radio" name="ndi-s4" value="1"> Só meu trabalho habitual, nada mais</label>
+                  <label class="q-radio-lbl"><input type="radio" name="ndi-s4" value="2"> A maior parte do meu trabalho habitual</label>
+                  <label class="q-radio-lbl"><input type="radio" name="ndi-s4" value="3"> Não consigo meu trabalho habitual</label>
+                  <label class="q-radio-lbl"><input type="radio" name="ndi-s4" value="4"> Dificilmente consigo trabalhar</label>
+                  <label class="q-radio-lbl"><input type="radio" name="ndi-s4" value="5"> Não consigo trabalhar de forma alguma</label>
+                </div>
+              </div>
+              <div class="q-item q-item-block"><div class="q-text-block"><span class="q-num">5</span> Cefaleia</div>
+                <div class="q-opts-block" data-name="ndi-s5">
+                  <label class="q-radio-lbl"><input type="radio" name="ndi-s5" value="0"> Sem cefaleia</label>
+                  <label class="q-radio-lbl"><input type="radio" name="ndi-s5" value="1"> Cefaleia leve e infrequente</label>
+                  <label class="q-radio-lbl"><input type="radio" name="ndi-s5" value="2"> Cefaleia moderada e infrequente</label>
+                  <label class="q-radio-lbl"><input type="radio" name="ndi-s5" value="3"> Cefaleia moderada e frequente</label>
+                  <label class="q-radio-lbl"><input type="radio" name="ndi-s5" value="4"> Cefaleia intensa e frequente</label>
+                  <label class="q-radio-lbl"><input type="radio" name="ndi-s5" value="5"> Cefaleia quase o tempo todo</label>
+                </div>
+              </div>
+              <div class="q-item q-item-block"><div class="q-text-block"><span class="q-num">6</span> Concentração</div>
+                <div class="q-opts-block" data-name="ndi-s6">
+                  <label class="q-radio-lbl"><input type="radio" name="ndi-s6" value="0"> Me concentro totalmente sem dificuldade</label>
+                  <label class="q-radio-lbl"><input type="radio" name="ndi-s6" value="1"> Me concentro com leve dificuldade</label>
+                  <label class="q-radio-lbl"><input type="radio" name="ndi-s6" value="2"> Dificuldade razoável para me concentrar</label>
+                  <label class="q-radio-lbl"><input type="radio" name="ndi-s6" value="3"> Muita dificuldade de concentração</label>
+                  <label class="q-radio-lbl"><input type="radio" name="ndi-s6" value="4"> Grande dificuldade de concentração</label>
+                  <label class="q-radio-lbl"><input type="radio" name="ndi-s6" value="5"> Não consigo me concentrar</label>
+                </div>
+              </div>
+              <div class="q-item q-item-block"><div class="q-text-block"><span class="q-num">7</span> Sono</div>
+                <div class="q-opts-block" data-name="ndi-s7">
+                  <label class="q-radio-lbl"><input type="radio" name="ndi-s7" value="0"> Sem problemas para dormir</label>
+                  <label class="q-radio-lbl"><input type="radio" name="ndi-s7" value="1"> Sono levemente perturbado (menos de 1 h)</label>
+                  <label class="q-radio-lbl"><input type="radio" name="ndi-s7" value="2"> Sono levemente perturbado (1–2 h)</label>
+                  <label class="q-radio-lbl"><input type="radio" name="ndi-s7" value="3"> Sono moderadamente perturbado (2–3 h)</label>
+                  <label class="q-radio-lbl"><input type="radio" name="ndi-s7" value="4"> Sono muito perturbado (3–5 h)</label>
+                  <label class="q-radio-lbl"><input type="radio" name="ndi-s7" value="5"> Sono completamente perturbado (5–7 h)</label>
+                </div>
+              </div>
+              <div class="q-item q-item-block"><div class="q-text-block"><span class="q-num">8</span> Dirigir</div>
+                <div class="q-opts-block" data-name="ndi-s8">
+                  <label class="q-radio-lbl"><input type="radio" name="ndi-s8" value="0"> Dirijo sem dor cervical</label>
+                  <label class="q-radio-lbl"><input type="radio" name="ndi-s8" value="1"> Dirijo quanto quero com dor leve</label>
+                  <label class="q-radio-lbl"><input type="radio" name="ndi-s8" value="2"> Dirijo quanto quero com dor moderada</label>
+                  <label class="q-radio-lbl"><input type="radio" name="ndi-s8" value="3"> Não dirijo quanto quero por dor moderada</label>
+                  <label class="q-radio-lbl"><input type="radio" name="ndi-s8" value="4"> Dificilmente consigo dirigir por dor intensa</label>
+                  <label class="q-radio-lbl"><input type="radio" name="ndi-s8" value="5"> Não consigo dirigir de forma alguma</label>
+                </div>
+              </div>
+              <div class="q-item q-item-block"><div class="q-text-block"><span class="q-num">9</span> Leitura</div>
+                <div class="q-opts-block" data-name="ndi-s9">
+                  <label class="q-radio-lbl"><input type="radio" name="ndi-s9" value="0"> Leio quanto quero sem dor cervical</label>
+                  <label class="q-radio-lbl"><input type="radio" name="ndi-s9" value="1"> Leio quanto quero com dor leve</label>
+                  <label class="q-radio-lbl"><input type="radio" name="ndi-s9" value="2"> Leio quanto quero com dor moderada</label>
+                  <label class="q-radio-lbl"><input type="radio" name="ndi-s9" value="3"> Não leio quanto quero por dor moderada</label>
+                  <label class="q-radio-lbl"><input type="radio" name="ndi-s9" value="4"> Não leio quanto quero por dor intensa</label>
+                  <label class="q-radio-lbl"><input type="radio" name="ndi-s9" value="5"> Não consigo ler de forma alguma</label>
+                </div>
+              </div>
+              <div class="q-item q-item-block"><div class="q-text-block"><span class="q-num">10</span> Lazer / Recreação</div>
+                <div class="q-opts-block" data-name="ndi-s10">
+                  <label class="q-radio-lbl"><input type="radio" name="ndi-s10" value="0"> Sem dor cervical em atividades de lazer</label>
+                  <label class="q-radio-lbl"><input type="radio" name="ndi-s10" value="1"> Alguma dor em todas as atividades de lazer</label>
+                  <label class="q-radio-lbl"><input type="radio" name="ndi-s10" value="2"> Alguma dor em poucas atividades de lazer</label>
+                  <label class="q-radio-lbl"><input type="radio" name="ndi-s10" value="3"> Dor na maioria das atividades de lazer</label>
+                  <label class="q-radio-lbl"><input type="radio" name="ndi-s10" value="4"> Dificilmente faço lazer por dor cervical</label>
+                  <label class="q-radio-lbl"><input type="radio" name="ndi-s10" value="5"> Não consigo fazer lazer por dor cervical</label>
+                </div>
+              </div>
+            </div>
+            <input type="hidden" id="ndi">
+          </div>
+
+          <!-- ══════════════════════════════════════════════════════ -->
+          <!-- VISA-P -->
+          <!-- ══════════════════════════════════════════════════════ -->
+          <div class="card" style="margin-bottom:14px">
+            <div class="card-title"><i class="ti ti-run"></i> VISA-P — Tendinopatia patelar</div>
+            <p style="font-size:12px;color:#888;margin-bottom:10px">8 questões · score máximo 100. Calculado automaticamente.</p>
+            <div class="escala-resultado" id="visap-resultado">Score: —</div>
+
+            <div class="q-list">
+              <div class="q-item"><span class="q-num">1</span><span class="q-text">Por quantos minutos consegue sentar sem dor?</span>
+                <div style="display:flex;align-items:center;gap:10px;margin-top:6px">
+                  <span style="font-size:11px;color:#888">0 min</span>
+                  <input type="range" id="vp-q1" min="0" max="10" step="1" value="0" style="flex:1" oninput="calcVISAP()">
+                  <span style="font-size:11px;color:#888">100+ min</span>
+                  <span id="vp-q1-v" style="font-weight:600;min-width:24px">0</span>
+                </div>
+              </div>
+              <div class="q-item"><span class="q-num">2</span><span class="q-text">Tem dor descendo escadas com ciclo de marcha normal?</span>
+                <div style="display:flex;align-items:center;gap:10px;margin-top:6px">
+                  <span style="font-size:11px;color:#888">Dor forte</span>
+                  <input type="range" id="vp-q2" min="0" max="10" step="1" value="10" style="flex:1" oninput="calcVISAP()">
+                  <span style="font-size:11px;color:#888">Sem dor</span>
+                  <span id="vp-q2-v" style="font-weight:600;min-width:24px">10</span>
+                </div>
+              </div>
+              <div class="q-item"><span class="q-num">3</span><span class="q-text">Tem dor na extensão ativa do joelho sem apoio?</span>
+                <div style="display:flex;align-items:center;gap:10px;margin-top:6px">
+                  <span style="font-size:11px;color:#888">Dor forte</span>
+                  <input type="range" id="vp-q3" min="0" max="10" step="1" value="10" style="flex:1" oninput="calcVISAP()">
+                  <span style="font-size:11px;color:#888">Sem dor</span>
+                  <span id="vp-q3-v" style="font-weight:600;min-width:24px">10</span>
+                </div>
+              </div>
+              <div class="q-item"><span class="q-num">4</span><span class="q-text">Tem dor ao fazer afundo (lunge) com carga total?</span>
+                <div style="display:flex;align-items:center;gap:10px;margin-top:6px">
+                  <span style="font-size:11px;color:#888">Dor forte</span>
+                  <input type="range" id="vp-q4" min="0" max="10" step="1" value="10" style="flex:1" oninput="calcVISAP()">
+                  <span style="font-size:11px;color:#888">Sem dor</span>
+                  <span id="vp-q4-v" style="font-weight:600;min-width:24px">10</span>
+                </div>
+              </div>
+              <div class="q-item"><span class="q-num">5</span><span class="q-text">Tem problemas para agachar?</span>
+                <div style="display:flex;align-items:center;gap:10px;margin-top:6px">
+                  <span style="font-size:11px;color:#888">Incapaz</span>
+                  <input type="range" id="vp-q5" min="0" max="10" step="1" value="10" style="flex:1" oninput="calcVISAP()">
+                  <span style="font-size:11px;color:#888">Sem problema</span>
+                  <span id="vp-q5-v" style="font-weight:600;min-width:24px">10</span>
+                </div>
+              </div>
+              <div class="q-item"><span class="q-num">6</span><span class="q-text">Tem dor durante ou logo após 10 saltos unipodais?</span>
+                <div style="display:flex;align-items:center;gap:10px;margin-top:6px">
+                  <span style="font-size:11px;color:#888">Dor forte</span>
+                  <input type="range" id="vp-q6" min="0" max="10" step="1" value="10" style="flex:1" oninput="calcVISAP()">
+                  <span style="font-size:11px;color:#888">Sem dor</span>
+                  <span id="vp-q6-v" style="font-weight:600;min-width:24px">10</span>
+                </div>
+              </div>
+              <div class="q-item q-item-block"><div class="q-text-block"><span class="q-num">7</span> Pratica esporte ou atividade física atualmente?</div>
+                <div class="q-opts-block" data-name="vp-q7">
+                  <label class="q-radio-lbl"><input type="radio" name="vp-q7" value="0" onchange="calcVISAP()"> Não pratica nada</label>
+                  <label class="q-radio-lbl"><input type="radio" name="vp-q7" value="4" onchange="calcVISAP()"> Treino modificado ± competição modificada</label>
+                  <label class="q-radio-lbl"><input type="radio" name="vp-q7" value="7" onchange="calcVISAP()"> Treino completo ± competição, mas não no nível anterior</label>
+                  <label class="q-radio-lbl"><input type="radio" name="vp-q7" value="10" onchange="calcVISAP()"> Competindo no mesmo nível ou superior ao início dos sintomas</label>
+                </div>
+              </div>
+              <div class="q-item q-item-block"><div class="q-text-block"><span class="q-num">8</span> Por quanto tempo consegue treinar/praticar?</div>
+                <div class="q-opts-block" data-name="vp-q8a">
+                  <label style="font-size:12px;font-weight:500;margin-bottom:4px;display:block">8a — Sem dor durante o esporte:</label>
+                  <label class="q-radio-lbl"><input type="radio" name="vp-q8" value="0" onchange="calcVISAP()"> Nenhum tempo</label>
+                  <label class="q-radio-lbl"><input type="radio" name="vp-q8" value="7" onchange="calcVISAP()"> 1–5 min</label>
+                  <label class="q-radio-lbl"><input type="radio" name="vp-q8" value="14" onchange="calcVISAP()"> 6–10 min</label>
+                  <label class="q-radio-lbl"><input type="radio" name="vp-q8" value="21" onchange="calcVISAP()"> 11–15 min</label>
+                  <label class="q-radio-lbl"><input type="radio" name="vp-q8" value="30" onchange="calcVISAP()"> Mais de 15 min</label>
+                </div>
+              </div>
+            </div>
+            <input type="hidden" id="visap">
+          </div>
+
+          <!-- ══════════════════════════════════════════════════════ -->
+          <!-- VISA-A -->
+          <!-- ══════════════════════════════════════════════════════ -->
+          <div class="card" style="margin-bottom:14px">
+            <div class="card-title"><i class="ti ti-run"></i> VISA-A — Tendinopatia aquiliana</div>
+            <p style="font-size:12px;color:#888;margin-bottom:10px">8 questões · score máximo 100. Calculado automaticamente.</p>
+            <div class="escala-resultado" id="visaa-resultado">Score: —</div>
+
+            <div class="q-list">
+              <div class="q-item"><span class="q-num">1</span><span class="q-text">Quantos minutos tem rigidez no tendão de Aquiles ao acordar?</span>
+                <div style="display:flex;align-items:center;gap:10px;margin-top:6px">
+                  <span style="font-size:11px;color:#888">100 min</span>
+                  <input type="range" id="va-q1" min="0" max="10" step="1" value="10" style="flex:1" oninput="calcVISAA()">
+                  <span style="font-size:11px;color:#888">0 min</span>
+                  <span id="va-q1-v" style="font-weight:600;min-width:24px">10</span>
+                </div>
+              </div>
+              <div class="q-item"><span class="q-num">2</span><span class="q-text">Tem dor ao alongar o Aquiles na borda de um degrau (joelho estendido)?</span>
+                <div style="display:flex;align-items:center;gap:10px;margin-top:6px">
+                  <span style="font-size:11px;color:#888">Dor forte</span>
+                  <input type="range" id="va-q2" min="0" max="10" step="1" value="10" style="flex:1" oninput="calcVISAA()">
+                  <span style="font-size:11px;color:#888">Sem dor</span>
+                  <span id="va-q2-v" style="font-weight:600;min-width:24px">10</span>
+                </div>
+              </div>
+              <div class="q-item"><span class="q-num">3</span><span class="q-text">Após caminhar 30 min no plano, tem dor nas próximas 2 horas?</span>
+                <div style="display:flex;align-items:center;gap:10px;margin-top:6px">
+                  <span style="font-size:11px;color:#888">Dor forte</span>
+                  <input type="range" id="va-q3" min="0" max="10" step="1" value="10" style="flex:1" oninput="calcVISAA()">
+                  <span style="font-size:11px;color:#888">Sem dor</span>
+                  <span id="va-q3-v" style="font-weight:600;min-width:24px">10</span>
+                </div>
+              </div>
+              <div class="q-item"><span class="q-num">4</span><span class="q-text">Tem dor descendo escadas com ciclo de marcha normal?</span>
+                <div style="display:flex;align-items:center;gap:10px;margin-top:6px">
+                  <span style="font-size:11px;color:#888">Dor forte</span>
+                  <input type="range" id="va-q4" min="0" max="10" step="1" value="10" style="flex:1" oninput="calcVISAA()">
+                  <span style="font-size:11px;color:#888">Sem dor</span>
+                  <span id="va-q4-v" style="font-weight:600;min-width:24px">10</span>
+                </div>
+              </div>
+              <div class="q-item"><span class="q-num">5</span><span class="q-text">Tem dor durante ou após 10 elevações unipodais do calcanhar no plano?</span>
+                <div style="display:flex;align-items:center;gap:10px;margin-top:6px">
+                  <span style="font-size:11px;color:#888">Dor forte</span>
+                  <input type="range" id="va-q5" min="0" max="10" step="1" value="10" style="flex:1" oninput="calcVISAA()">
+                  <span style="font-size:11px;color:#888">Sem dor</span>
+                  <span id="va-q5-v" style="font-weight:600;min-width:24px">10</span>
+                </div>
+              </div>
+              <div class="q-item"><span class="q-num">6</span><span class="q-text">Quantos saltos unipodais sem dor consegue realizar? (0–10)</span>
+                <div style="display:flex;align-items:center;gap:10px;margin-top:6px">
+                  <span style="font-size:11px;color:#888">0</span>
+                  <input type="range" id="va-q6" min="0" max="10" step="1" value="10" style="flex:1" oninput="calcVISAA()">
+                  <span style="font-size:11px;color:#888">10</span>
+                  <span id="va-q6-v" style="font-weight:600;min-width:24px">10</span>
+                </div>
+              </div>
+              <div class="q-item q-item-block"><div class="q-text-block"><span class="q-num">7</span> Pratica esporte ou atividade física atualmente?</div>
+                <div class="q-opts-block" data-name="va-q7">
+                  <label class="q-radio-lbl"><input type="radio" name="va-q7" value="0" onchange="calcVISAA()"> Não pratica nada</label>
+                  <label class="q-radio-lbl"><input type="radio" name="va-q7" value="4" onchange="calcVISAA()"> Treino modificado ± competição modificada</label>
+                  <label class="q-radio-lbl"><input type="radio" name="va-q7" value="7" onchange="calcVISAA()"> Treino completo, mas não no nível anterior</label>
+                  <label class="q-radio-lbl"><input type="radio" name="va-q7" value="10" onchange="calcVISAA()"> Competindo no mesmo nível ou superior</label>
+                </div>
+              </div>
+              <div class="q-item q-item-block"><div class="q-text-block"><span class="q-num">8</span> Por quanto tempo consegue treinar/praticar esporte com carga no Aquiles?</div>
+                <div class="q-opts-block" data-name="va-q8a">
+                  <label style="font-size:12px;font-weight:500;margin-bottom:4px;display:block">8a — Sem dor:</label>
+                  <label class="q-radio-lbl"><input type="radio" name="va-q8" value="0" onchange="calcVISAA()"> Nenhum tempo</label>
+                  <label class="q-radio-lbl"><input type="radio" name="va-q8" value="7" onchange="calcVISAA()"> 1–10 min</label>
+                  <label class="q-radio-lbl"><input type="radio" name="va-q8" value="14" onchange="calcVISAA()"> 11–20 min</label>
+                  <label class="q-radio-lbl"><input type="radio" name="va-q8" value="21" onchange="calcVISAA()"> 21–30 min</label>
+                  <label class="q-radio-lbl"><input type="radio" name="va-q8" value="30" onchange="calcVISAA()"> Mais de 30 min</label>
+                </div>
+              </div>
+            </div>
+            <input type="hidden" id="visaa">
+          </div>
+
           <div class="tab-nav-btns">
             <button class="btn btn-outline" onclick="showTab(5)"><i class="ti ti-arrow-left"></i> Anterior</button>
             <button class="btn btn-primary" onclick="showTab(7)">Próximo <i class="ti ti-arrow-right"></i></button>
