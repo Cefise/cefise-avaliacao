@@ -473,6 +473,7 @@ function salvarAvaliacao() {
     odi:fn('odi'), dash:fn('dash'), quickdash:fn('quickdash'),
     visap:fn('visap'), visaa:fn('visaa'),
     faam_avd:fn('faam-avd'), faam_esp:fn('faam-esp'),
+    ndi:fn('ndi'),
 
     // RTP
     aclrsi:fn('aclrsi'),
@@ -541,6 +542,7 @@ function loadRelatorio(pacId) {
   if(last.visap) escalas.push(`VISA-P: <b>${n(last.visap)}</b>`);
   if(last.visaa) escalas.push(`VISA-A: <b>${n(last.visaa)}</b>`);
   if(last.faam_avd) escalas.push(`FAAM AVD: <b>${n(last.faam_avd)}</b> · Esporte: <b>${n(last.faam_esp)}</b>`);
+  if(last.ndi) escalas.push(`NDI (cervical): <b>${n(last.ndi)}%</b>`);
   if(last.aclrsi) escalas.push(`ACL-RSI: <b>${n(last.aclrsi)}/100</b>`);
 
   const rtpCount=[last.rtp_lsi,last.rtp_forca,last.rtp_dor,last.rtp_edema,last.rtp_psico,last.rtp_tempo,last.rtp_agilidade,last.rtp_treino].filter(Boolean).length;
@@ -709,6 +711,7 @@ function gerarPDF() {
   if(last.visap) escalasData.push(['VISA-P',last.visap]);
   if(last.visaa) escalasData.push(['VISA-A',last.visaa]);
   if(last.faam_avd) escalasData.push(['FAAM AVD',last.faam_avd],['FAAM Esporte',last.faam_esp]);
+  if(last.ndi) escalasData.push(['NDI (cervical) %',last.ndi]);
   if(escalasData.length){section('Escalas funcionais');escalasData.forEach(([l,v])=>row(l,v));y+=4;}
 
   // RTP
@@ -788,3 +791,194 @@ function removeProfissional(id) {
   saveDB(db);
   renderProfissionais();
 }
+
+// ─── ESCALAS INTERATIVAS ─────────────────────────────────────
+
+// Inicializa botões de opção 1–5 do DASH
+function initDASH() {
+  const labels = ['Sem dificuldade','Pouca dificuldade','Dificuldade média','Muita dificuldade','Não conseguiu'];
+  for (let q = 1; q <= 30; q++) {
+    const container = document.querySelector(`[data-name="dash-q${q}"]`);
+    if (!container) continue;
+    container.innerHTML = '';
+    for (let v = 1; v <= 5; v++) {
+      const btn = document.createElement('button');
+      btn.type = 'button';
+      btn.className = 'q-opt-btn';
+      btn.textContent = v;
+      btn.title = labels[v-1];
+      btn.dataset.val = v;
+      btn.onclick = () => {
+        container.querySelectorAll('.q-opt-btn').forEach(b => b.classList.remove('selected'));
+        btn.classList.add('selected');
+        calcDASH();
+      };
+      container.appendChild(btn);
+    }
+  }
+}
+
+function calcDASH() {
+  const vals = [];
+  for (let q = 1; q <= 30; q++) {
+    const sel = document.querySelector(`[data-name="dash-q${q}"] .q-opt-btn.selected`);
+    if (sel) vals.push(parseInt(sel.dataset.val));
+  }
+  const n = vals.length;
+  const el = document.getElementById('dash-resultado');
+  const cls = document.getElementById('dash-class');
+  const hidden = document.getElementById('dash');
+  if (n < 27) {
+    if (el) el.textContent = `Score: — (${n}/30 respondidas, mín. 27)`;
+    if (cls) cls.textContent = '';
+    if (hidden) hidden.value = '';
+    return;
+  }
+  const score = ((vals.reduce((a,b)=>a+b,0)/n - 1) * 25);
+  const rounded = Math.round(score * 10) / 10;
+  if (el) el.textContent = `Score: ${rounded.toFixed(1)} / 100`;
+  if (hidden) hidden.value = rounded;
+  let classification = '';
+  if (rounded < 20) classification = '< 20 — Excelente';
+  else if (rounded < 40) classification = '20–39 — Bom';
+  else if (rounded <= 60) classification = '40–60 — Regular';
+  else classification = '> 60 — Incapacidade funcional grave';
+  if (cls) cls.textContent = classification;
+}
+
+function calcODI() {
+  const vals = [];
+  for (let s = 1; s <= 10; s++) {
+    const checked = document.querySelector(`input[name="odi-s${s}"]:checked`);
+    if (checked) vals.push(parseInt(checked.value));
+  }
+  const el = document.getElementById('odi-resultado');
+  const cls = document.getElementById('odi-class');
+  const hidden = document.getElementById('odi');
+  if (vals.length === 0) { if(el) el.textContent='Score: —'; return; }
+  const maxPts = vals.length * 5;
+  const score = Math.round((vals.reduce((a,b)=>a+b,0) / maxPts) * 100);
+  if (el) el.textContent = `Score: ${score}%`;
+  if (hidden) hidden.value = score;
+  let classification = '';
+  if (score <= 20) classification = '0–20% — Incapacidade mínima';
+  else if (score <= 40) classification = '21–40% — Incapacidade moderada';
+  else if (score <= 60) classification = '41–60% — Incapacidade intensa';
+  else if (score <= 80) classification = '61–80% — Aleijado';
+  else classification = '81–100% — Inválido';
+  if (cls) cls.textContent = classification;
+}
+
+function calcNDI() {
+  const vals = [];
+  for (let s = 1; s <= 10; s++) {
+    const checked = document.querySelector(`input[name="ndi-s${s}"]:checked`);
+    if (checked) vals.push(parseInt(checked.value));
+  }
+  const el = document.getElementById('ndi-resultado');
+  const cls = document.getElementById('ndi-class');
+  const hidden = document.getElementById('ndi');
+  if (vals.length === 0) { if(el) el.textContent='Score: —'; return; }
+  const maxPts = vals.length * 5;
+  const score = Math.round((vals.reduce((a,b)=>a+b,0) / maxPts) * 100);
+  if (el) el.textContent = `Score: ${score}%`;
+  if (hidden) hidden.value = score;
+  let classification = '';
+  if (score <= 8) classification = '0–8% — Sem incapacidade';
+  else if (score <= 28) classification = '10–28% — Incapacidade leve';
+  else if (score <= 48) classification = '30–48% — Incapacidade moderada';
+  else if (score <= 64) classification = '50–64% — Incapacidade grave';
+  else classification = '> 65% — Incapacidade completa';
+  if (cls) cls.textContent = classification;
+}
+
+function calcVISAP() {
+  const sliders = ['vp-q1','vp-q2','vp-q3','vp-q4','vp-q5','vp-q6'];
+  sliders.forEach(id => {
+    const el = document.getElementById(id);
+    const disp = document.getElementById(id+'-v');
+    if (el && disp) disp.textContent = el.value;
+  });
+  const q1 = parseInt(document.getElementById('vp-q1')?.value || 0);
+  const q2 = parseInt(document.getElementById('vp-q2')?.value || 0);
+  const q3 = parseInt(document.getElementById('vp-q3')?.value || 0);
+  const q4 = parseInt(document.getElementById('vp-q4')?.value || 0);
+  const q5 = parseInt(document.getElementById('vp-q5')?.value || 0);
+  const q6 = parseInt(document.getElementById('vp-q6')?.value || 0);
+  const q7el = document.querySelector('input[name="vp-q7"]:checked');
+  const q8el = document.querySelector('input[name="vp-q8"]:checked');
+  const q7 = q7el ? parseInt(q7el.value) : null;
+  const q8 = q8el ? parseInt(q8el.value) : null;
+  if (q7 === null || q8 === null) return;
+  const total = q1 + q2 + q3 + q4 + q5 + q6 + q7 + q8;
+  const el = document.getElementById('visap-resultado');
+  const hidden = document.getElementById('visap');
+  if (el) el.textContent = `Score: ${total} / 100`;
+  if (hidden) hidden.value = total;
+}
+
+function calcVISAA() {
+  const sliders = ['va-q1','va-q2','va-q3','va-q4','va-q5','va-q6'];
+  sliders.forEach(id => {
+    const el = document.getElementById(id);
+    const disp = document.getElementById(id+'-v');
+    if (el && disp) disp.textContent = el.value;
+  });
+  const q1 = parseInt(document.getElementById('va-q1')?.value || 0);
+  const q2 = parseInt(document.getElementById('va-q2')?.value || 0);
+  const q3 = parseInt(document.getElementById('va-q3')?.value || 0);
+  const q4 = parseInt(document.getElementById('va-q4')?.value || 0);
+  const q5 = parseInt(document.getElementById('va-q5')?.value || 0);
+  const q6 = parseInt(document.getElementById('va-q6')?.value || 0);
+  const q7el = document.querySelector('input[name="va-q7"]:checked');
+  const q8el = document.querySelector('input[name="va-q8"]:checked');
+  const q7 = q7el ? parseInt(q7el.value) : null;
+  const q8 = q8el ? parseInt(q8el.value) : null;
+  if (q7 === null || q8 === null) return;
+  const total = q1 + q2 + q3 + q4 + q5 + q6 + q7 + q8;
+  const el = document.getElementById('visaa-resultado');
+  const hidden = document.getElementById('visaa');
+  if (el) el.textContent = `Score: ${total} / 100`;
+  if (hidden) hidden.value = total;
+}
+
+// Registrar listeners ODI e NDI + inicializar DASH ao carregar
+document.addEventListener('DOMContentLoaded', () => {
+  initDASH();
+  for (let s = 1; s <= 10; s++) {
+    document.querySelectorAll(`input[name="odi-s${s}"]`).forEach(r => r.addEventListener('change', calcODI));
+    document.querySelectorAll(`input[name="ndi-s${s}"]`).forEach(r => r.addEventListener('change', calcNDI));
+  }
+});
+
+// Atualizar clearForm para limpar escalas
+const _clearFormOrig = clearForm;
+clearForm = function() {
+  _clearFormOrig();
+  // Limpa DASH
+  document.querySelectorAll('[data-name^="dash-"] .q-opt-btn').forEach(b => b.classList.remove('selected'));
+  const dashRes = document.getElementById('dash-resultado'); if(dashRes) dashRes.textContent='Score: —';
+  const dashCls = document.getElementById('dash-class'); if(dashCls) dashCls.textContent='';
+  // Limpa ODI e NDI
+  ['odi','ndi'].forEach(prefix => {
+    for (let s = 1; s <= 10; s++) {
+      document.querySelectorAll(`input[name="${prefix}-s${s}"]`).forEach(r => r.checked = false);
+    }
+    const res = document.getElementById(`${prefix}-resultado`); if(res) res.textContent='Score: —';
+    const cls = document.getElementById(`${prefix}-class`); if(cls) cls.textContent='';
+  });
+  // Limpa VISA-P
+  ['vp-q1','vp-q2','vp-q3','vp-q4','vp-q5','vp-q6'].forEach(id => {
+    const el=document.getElementById(id); if(el){ el.value = id==='vp-q1'?0:10; const d=document.getElementById(id+'-v'); if(d) d.textContent=el.value; }
+  });
+  document.querySelectorAll('input[name="vp-q7"], input[name="vp-q8"]').forEach(r => r.checked=false);
+  const vpRes = document.getElementById('visap-resultado'); if(vpRes) vpRes.textContent='Score: —';
+  // Limpa VISA-A
+  ['va-q1','va-q2','va-q3','va-q4','va-q5','va-q6'].forEach(id => {
+    const el=document.getElementById(id); if(el){ el.value=10; const d=document.getElementById(id+'-v'); if(d) d.textContent='10'; }
+  });
+  document.querySelectorAll('input[name="va-q7"], input[name="va-q8"]').forEach(r => r.checked=false);
+  const vaRes = document.getElementById('visaa-resultado'); if(vaRes) vaRes.textContent='Score: —';
+  // Limpa NDI hidden
+  ['ndi'].forEach(id => { const el=document.getElementById(id); if(el) el.value=''; });
+};
