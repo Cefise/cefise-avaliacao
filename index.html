@@ -558,33 +558,284 @@
         <div class="tab-pane" id="tp-6">
           <p style="font-size:13px;color:#888;margin:0 0 12px">Preencha somente as escalas aplicáveis ao caso. O score é calculado automaticamente ao preencher as questões.</p>
 
-          <!-- ── KOOS (score manual) ── -->
+          <!-- ══════════════════════════════════════════════════════ -->
+          <!-- KOOS COMPLETO — 42 itens em 5 subescalas -->
+          <!-- ══════════════════════════════════════════════════════ -->
           <div class="card" style="margin-bottom:14px">
             <div class="card-title"><i class="ti ti-activity"></i> KOOS — Knee Injury &amp; Osteoarthritis Outcome Score</div>
-            <p style="font-size:12px;color:#888;margin-bottom:8px">Insira os scores de cada subescala (0–100). Aplicar somente para lesões de joelho.</p>
-            <table class="t">
-              <tr><th>Subescala</th><th>Score (0–100)</th></tr>
-              <tr><td>Sintomas</td><td><input type="number" id="koos-sint" min="0" max="100" step="0.1"></td></tr>
-              <tr><td>Dor</td><td><input type="number" id="koos-dor" min="0" max="100" step="0.1"></td></tr>
-              <tr><td>AVD</td><td><input type="number" id="koos-avd" min="0" max="100" step="0.1"></td></tr>
-              <tr><td>Esporte / Recreação</td><td><input type="number" id="koos-esporte" min="0" max="100" step="0.1"></td></tr>
-              <tr><td>Qualidade de vida</td><td><input type="number" id="koos-qv" min="0" max="100" step="0.1"></td></tr>
-            </table>
+            <p style="font-size:12px;color:#888;margin-bottom:10px">42 itens · 5 subescalas · score 0–100 por subescala (100 = sem problemas). Calculado automaticamente.</p>
+            <div style="display:flex;flex-wrap:wrap;gap:10px;margin-bottom:12px">
+              <div class="escala-resultado" id="koos-sint-r">Sintomas: —</div>
+              <div class="escala-resultado" id="koos-dor-r">Dor: —</div>
+              <div class="escala-resultado" id="koos-avd-r">AVD: —</div>
+              <div class="escala-resultado" id="koos-esporte-r">Esporte: —</div>
+              <div class="escala-resultado" id="koos-qv-r">QV: —</div>
+            </div>
+
+            <!-- Sintomas (S1–S7) -->
+            <div class="q-group">
+              <div class="q-group-title">Sintomas — última semana (0 = Nunca/Sempre · 4 = Sempre/Nunca)</div>
+              <div class="q-list" id="koos-sint-list">
+                <div class="q-item q-item-block"><div class="q-text-block"><span class="q-num">S1</span> Tem tido o joelho inchado?</div>
+                  <div class="q-opts" data-name="ks-s1" data-labels="Nunca,Raramente,Às vezes,Frequentemente,Sempre"></div></div>
+                <div class="q-item q-item-block"><div class="q-text-block"><span class="q-num">S2</span> Tem sentido ranger, ouvido estalo ou outro som quando mexe o joelho?</div>
+                  <div class="q-opts" data-name="ks-s2" data-labels="Nunca,Raramente,Às vezes,Frequentemente,Sempre"></div></div>
+                <div class="q-item q-item-block"><div class="q-text-block"><span class="q-num">S3</span> Tem sentido o joelho preso ou bloqueado quando se mexe?</div>
+                  <div class="q-opts" data-name="ks-s3" data-labels="Nunca,Raramente,Às vezes,Frequentemente,Sempre"></div></div>
+                <div class="q-item q-item-block"><div class="q-text-block"><span class="q-num">S4</span> Tem conseguido esticar o joelho completamente?</div>
+                  <div class="q-opts" data-name="ks-s4" data-labels="Sempre,Frequentemente,Às vezes,Raramente,Nunca" data-reverse="1"></div></div>
+                <div class="q-item q-item-block"><div class="q-text-block"><span class="q-num">S5</span> Tem conseguido dobrar o joelho completamente?</div>
+                  <div class="q-opts" data-name="ks-s5" data-labels="Sempre,Frequentemente,Às vezes,Raramente,Nunca" data-reverse="1"></div></div>
+                <div class="q-item q-item-block"><div class="q-text-block"><span class="q-num">S6</span> Rigidez no joelho logo após acordar de manhã?</div>
+                  <div class="q-opts" data-name="ks-s6" data-labels="Nada,Pouco,Moderadamente,Muito,Muitíssimo"></div></div>
+                <div class="q-item q-item-block"><div class="q-text-block"><span class="q-num">S7</span> Rigidez após se sentar, deitar ou descansar ao fim do dia?</div>
+                  <div class="q-opts" data-name="ks-s7" data-labels="Nada,Pouco,Moderadamente,Muito,Muitíssimo"></div></div>
+              </div>
+            </div>
+
+            <!-- Dor (P1–P9) -->
+            <div class="q-group" style="margin-top:10px">
+              <div class="q-group-title">Dor — última semana</div>
+              <div class="q-list">
+                <div class="q-item q-item-block"><div class="q-text-block"><span class="q-num">P1</span> Com que frequência tem dores no joelho?</div>
+                  <div class="q-opts" data-name="ks-p1" data-labels="Nunca,1×/mês,1×/semana,Todos os dias,Sempre"></div></div>
+                <div class="q-item q-item-block"><div class="q-text-block"><span class="q-num">P2</span> Rodar/virar/torcer sobre o joelho</div>
+                  <div class="q-opts" data-name="ks-p2" data-labels="Nenhuma,Pouca,Moderada,Muita,Muitíssima"></div></div>
+                <div class="q-item q-item-block"><div class="q-text-block"><span class="q-num">P3</span> Esticar o joelho completamente</div>
+                  <div class="q-opts" data-name="ks-p3" data-labels="Nenhuma,Pouca,Moderada,Muita,Muitíssima"></div></div>
+                <div class="q-item q-item-block"><div class="q-text-block"><span class="q-num">P4</span> Dobrar o joelho completamente</div>
+                  <div class="q-opts" data-name="ks-p4" data-labels="Nenhuma,Pouca,Moderada,Muita,Muitíssima"></div></div>
+                <div class="q-item q-item-block"><div class="q-text-block"><span class="q-num">P5</span> Andar sobre superfície plana</div>
+                  <div class="q-opts" data-name="ks-p5" data-labels="Nenhuma,Pouca,Moderada,Muita,Muitíssima"></div></div>
+                <div class="q-item q-item-block"><div class="q-text-block"><span class="q-num">P6</span> Subir ou descer escadas</div>
+                  <div class="q-opts" data-name="ks-p6" data-labels="Nenhuma,Pouca,Moderada,Muita,Muitíssima"></div></div>
+                <div class="q-item q-item-block"><div class="q-text-block"><span class="q-num">P7</span> À noite, na cama</div>
+                  <div class="q-opts" data-name="ks-p7" data-labels="Nenhuma,Pouca,Moderada,Muita,Muitíssima"></div></div>
+                <div class="q-item q-item-block"><div class="q-text-block"><span class="q-num">P8</span> Estar sentado/a ou deitado/a</div>
+                  <div class="q-opts" data-name="ks-p8" data-labels="Nenhuma,Pouca,Moderada,Muita,Muitíssima"></div></div>
+                <div class="q-item q-item-block"><div class="q-text-block"><span class="q-num">P9</span> Estar de pé</div>
+                  <div class="q-opts" data-name="ks-p9" data-labels="Nenhuma,Pouca,Moderada,Muita,Muitíssima"></div></div>
+              </div>
+            </div>
+
+            <!-- AVD (A1–A17) -->
+            <div class="q-group" style="margin-top:10px">
+              <div class="q-group-title">Atividades da vida diária — dificuldade por causa do joelho</div>
+              <div class="q-list">
+                <div class="q-item q-item-block"><div class="q-text-block"><span class="q-num">A1</span> Descer escadas</div><div class="q-opts" data-name="ks-a1" data-labels="Nenhuma,Pouca,Moderada,Muita,Muitíssima"></div></div>
+                <div class="q-item q-item-block"><div class="q-text-block"><span class="q-num">A2</span> Subir escadas</div><div class="q-opts" data-name="ks-a2" data-labels="Nenhuma,Pouca,Moderada,Muita,Muitíssima"></div></div>
+                <div class="q-item q-item-block"><div class="q-text-block"><span class="q-num">A3</span> Levantar-se da posição sentado/a</div><div class="q-opts" data-name="ks-a3" data-labels="Nenhuma,Pouca,Moderada,Muita,Muitíssima"></div></div>
+                <div class="q-item q-item-block"><div class="q-text-block"><span class="q-num">A4</span> Manter-se de pé</div><div class="q-opts" data-name="ks-a4" data-labels="Nenhuma,Pouca,Moderada,Muita,Muitíssima"></div></div>
+                <div class="q-item q-item-block"><div class="q-text-block"><span class="q-num">A5</span> Dobrar-se para baixo / apanhar um objeto</div><div class="q-opts" data-name="ks-a5" data-labels="Nenhuma,Pouca,Moderada,Muita,Muitíssima"></div></div>
+                <div class="q-item q-item-block"><div class="q-text-block"><span class="q-num">A6</span> Andar numa superfície plana</div><div class="q-opts" data-name="ks-a6" data-labels="Nenhuma,Pouca,Moderada,Muita,Muitíssima"></div></div>
+                <div class="q-item q-item-block"><div class="q-text-block"><span class="q-num">A7</span> Entrar ou sair do carro</div><div class="q-opts" data-name="ks-a7" data-labels="Nenhuma,Pouca,Moderada,Muita,Muitíssima"></div></div>
+                <div class="q-item q-item-block"><div class="q-text-block"><span class="q-num">A8</span> Ir às compras</div><div class="q-opts" data-name="ks-a8" data-labels="Nenhuma,Pouca,Moderada,Muita,Muitíssima"></div></div>
+                <div class="q-item q-item-block"><div class="q-text-block"><span class="q-num">A9</span> Calçar meias/collants</div><div class="q-opts" data-name="ks-a9" data-labels="Nenhuma,Pouca,Moderada,Muita,Muitíssima"></div></div>
+                <div class="q-item q-item-block"><div class="q-text-block"><span class="q-num">A10</span> Levantar-se da cama</div><div class="q-opts" data-name="ks-a10" data-labels="Nenhuma,Pouca,Moderada,Muita,Muitíssima"></div></div>
+                <div class="q-item q-item-block"><div class="q-text-block"><span class="q-num">A11</span> Descalçar meias/collants</div><div class="q-opts" data-name="ks-a11" data-labels="Nenhuma,Pouca,Moderada,Muita,Muitíssima"></div></div>
+                <div class="q-item q-item-block"><div class="q-text-block"><span class="q-num">A12</span> Estar deitado/a na cama (virar-se, manter posição)</div><div class="q-opts" data-name="ks-a12" data-labels="Nenhuma,Pouca,Moderada,Muita,Muitíssima"></div></div>
+                <div class="q-item q-item-block"><div class="q-text-block"><span class="q-num">A13</span> Entrar/sair da banheira</div><div class="q-opts" data-name="ks-a13" data-labels="Nenhuma,Pouca,Moderada,Muita,Muitíssima"></div></div>
+                <div class="q-item q-item-block"><div class="q-text-block"><span class="q-num">A14</span> Estar sentado/a</div><div class="q-opts" data-name="ks-a14" data-labels="Nenhuma,Pouca,Moderada,Muita,Muitíssima"></div></div>
+                <div class="q-item q-item-block"><div class="q-text-block"><span class="q-num">A15</span> Sentar-se ou levantar-se da sanita</div><div class="q-opts" data-name="ks-a15" data-labels="Nenhuma,Pouca,Moderada,Muita,Muitíssima"></div></div>
+                <div class="q-item q-item-block"><div class="q-text-block"><span class="q-num">A16</span> Tarefas domésticas pesadas (caixas pesadas, esfregar chão)</div><div class="q-opts" data-name="ks-a16" data-labels="Nenhuma,Pouca,Moderada,Muita,Muitíssima"></div></div>
+                <div class="q-item q-item-block"><div class="q-text-block"><span class="q-num">A17</span> Tarefas domésticas leves (cozinhar, limpar pó)</div><div class="q-opts" data-name="ks-a17" data-labels="Nenhuma,Pouca,Moderada,Muita,Muitíssima"></div></div>
+              </div>
+            </div>
+
+            <!-- Esporte (SP1–SP5) -->
+            <div class="q-group" style="margin-top:10px">
+              <div class="q-group-title">Esporte e lazer — dificuldade por causa do joelho</div>
+              <div class="q-list">
+                <div class="q-item q-item-block"><div class="q-text-block"><span class="q-num">SP1</span> Pôr-se de cócoras</div><div class="q-opts" data-name="ks-sp1" data-labels="Nenhuma,Pouca,Moderada,Muita,Muitíssima"></div></div>
+                <div class="q-item q-item-block"><div class="q-text-block"><span class="q-num">SP2</span> Correr</div><div class="q-opts" data-name="ks-sp2" data-labels="Nenhuma,Pouca,Moderada,Muita,Muitíssima"></div></div>
+                <div class="q-item q-item-block"><div class="q-text-block"><span class="q-num">SP3</span> Saltar</div><div class="q-opts" data-name="ks-sp3" data-labels="Nenhuma,Pouca,Moderada,Muita,Muitíssima"></div></div>
+                <div class="q-item q-item-block"><div class="q-text-block"><span class="q-num">SP4</span> Rodar/virar/torcer sobre o joelho afetado</div><div class="q-opts" data-name="ks-sp4" data-labels="Nenhuma,Pouca,Moderada,Muita,Muitíssima"></div></div>
+                <div class="q-item q-item-block"><div class="q-text-block"><span class="q-num">SP5</span> Ajoelhar</div><div class="q-opts" data-name="ks-sp5" data-labels="Nenhuma,Pouca,Moderada,Muita,Muitíssima"></div></div>
+              </div>
+            </div>
+
+            <!-- QV (Q1–Q4) -->
+            <div class="q-group" style="margin-top:10px">
+              <div class="q-group-title">Qualidade de vida</div>
+              <div class="q-list">
+                <div class="q-item q-item-block"><div class="q-text-block"><span class="q-num">Q1</span> Com que frequência tem consciência do problema no joelho?</div>
+                  <div class="q-opts" data-name="ks-q1" data-labels="Nunca,1×/mês,1×/semana,Todos os dias,Constantemente"></div></div>
+                <div class="q-item q-item-block"><div class="q-text-block"><span class="q-num">Q2</span> Modificou seu estilo de vida para evitar atividades que afetam o joelho?</div>
+                  <div class="q-opts" data-name="ks-q2" data-labels="De modo algum,Um pouco,Moderadamente,Muito,Completamente"></div></div>
+                <div class="q-item q-item-block"><div class="q-text-block"><span class="q-num">Q3</span> A falta de confiança no joelho incomoda?</div>
+                  <div class="q-opts" data-name="ks-q3" data-labels="Nada,Um pouco,Moderadamente,Muito,Muitíssimo"></div></div>
+                <div class="q-item q-item-block"><div class="q-text-block"><span class="q-num">Q4</span> Em geral, o joelho lhe causa muitos problemas?</div>
+                  <div class="q-opts" data-name="ks-q4" data-labels="Nenhuns,Poucos,Alguns,Muitos,Muitíssimos"></div></div>
+              </div>
+            </div>
+            <!-- hidden fields para salvar -->
+            <input type="hidden" id="koos-sint"><input type="hidden" id="koos-dor">
+            <input type="hidden" id="koos-avd"><input type="hidden" id="koos-esporte"><input type="hidden" id="koos-qv">
           </div>
 
-          <!-- ── IKDC ── -->
+          <!-- ══════════════════════════════════════════════════════ -->
+          <!-- IKDC COMPLETO — 10 questões -->
+          <!-- ══════════════════════════════════════════════════════ -->
           <div class="card" style="margin-bottom:14px">
             <div class="card-title"><i class="ti ti-activity"></i> IKDC — International Knee Documentation Committee</div>
-            <p style="font-size:12px;color:#888;margin-bottom:8px">Score subjetivo 0–100 (calculado externamente ou pelo profissional).</p>
-            <table class="t">
-              <tr><th>Score IKDC (0–100)</th></tr>
-              <tr><td><input type="number" id="ikdc" min="0" max="100" step="0.1" placeholder="0–100"></td></tr>
-            </table>
+            <p style="font-size:12px;color:#888;margin-bottom:10px">10 questões · score = (soma / máximo possível) × 100. Calculado automaticamente.</p>
+            <div class="escala-resultado" id="ikdc-resultado">Score: —</div>
+
+            <div class="q-list" style="margin-top:10px">
+              <!-- Q1 -->
+              <div class="q-item q-item-block"><div class="q-text-block"><span class="q-num">1</span> Maior nível de atividade sem dor significativa no joelho</div>
+                <div class="q-opts-block" data-name="ikdc-q1">
+                  <label class="q-radio-lbl"><input type="radio" name="ikdc-q1" value="4" onchange="calcIKDC()"> Atividades muito intensas (saltar, pivotar — futebol, basquete)</label>
+                  <label class="q-radio-lbl"><input type="radio" name="ikdc-q1" value="3" onchange="calcIKDC()"> Atividades intensas (trabalho pesado, esqui, tênis)</label>
+                  <label class="q-radio-lbl"><input type="radio" name="ikdc-q1" value="2" onchange="calcIKDC()"> Atividades moderadas (corrida, trabalho moderado)</label>
+                  <label class="q-radio-lbl"><input type="radio" name="ikdc-q1" value="1" onchange="calcIKDC()"> Atividades leves (caminhada, trabalho doméstico)</label>
+                  <label class="q-radio-lbl"><input type="radio" name="ikdc-q1" value="0" onchange="calcIKDC()"> Incapaz de realizar nenhuma das atividades acima</label>
+                </div>
+              </div>
+              <!-- Q2 -->
+              <div class="q-item q-item-block"><div class="q-text-block"><span class="q-num">2</span> Com que frequência teve dor nas últimas 4 semanas / desde a lesão?</div>
+                <div style="display:flex;align-items:center;gap:10px;padding-left:32px;margin-top:6px">
+                  <span style="font-size:11px;color:#888">Nunca (10)</span>
+                  <input type="range" id="ikdc-q2" min="0" max="10" step="1" value="10" style="flex:1" oninput="document.getElementById('ikdc-q2-v').textContent=this.value;calcIKDC()">
+                  <span style="font-size:11px;color:#888">Constante (0)</span>
+                  <span id="ikdc-q2-v" style="font-weight:600;min-width:20px">10</span>
+                </div>
+              </div>
+              <!-- Q3 -->
+              <div class="q-item q-item-block"><div class="q-text-block"><span class="q-num">3</span> Intensidade da dor (se houver)</div>
+                <div style="display:flex;align-items:center;gap:10px;padding-left:32px;margin-top:6px">
+                  <span style="font-size:11px;color:#888">Sem dor (10)</span>
+                  <input type="range" id="ikdc-q3" min="0" max="10" step="1" value="10" style="flex:1" oninput="document.getElementById('ikdc-q3-v').textContent=this.value;calcIKDC()">
+                  <span style="font-size:11px;color:#888">Pior imaginável (0)</span>
+                  <span id="ikdc-q3-v" style="font-weight:600;min-width:20px">10</span>
+                </div>
+              </div>
+              <!-- Q4 -->
+              <div class="q-item q-item-block"><div class="q-text-block"><span class="q-num">4</span> Edema / rigidez nas últimas 4 semanas</div>
+                <div class="q-opts-block" data-name="ikdc-q4">
+                  <label class="q-radio-lbl"><input type="radio" name="ikdc-q4" value="4" onchange="calcIKDC()"> Nenhum</label>
+                  <label class="q-radio-lbl"><input type="radio" name="ikdc-q4" value="3" onchange="calcIKDC()"> Leve</label>
+                  <label class="q-radio-lbl"><input type="radio" name="ikdc-q4" value="2" onchange="calcIKDC()"> Moderado</label>
+                  <label class="q-radio-lbl"><input type="radio" name="ikdc-q4" value="1" onchange="calcIKDC()"> Muito</label>
+                  <label class="q-radio-lbl"><input type="radio" name="ikdc-q4" value="0" onchange="calcIKDC()"> Extremo</label>
+                </div>
+              </div>
+              <!-- Q5 -->
+              <div class="q-item q-item-block"><div class="q-text-block"><span class="q-num">5</span> Maior nível de atividade sem edema significativo</div>
+                <div class="q-opts-block" data-name="ikdc-q5">
+                  <label class="q-radio-lbl"><input type="radio" name="ikdc-q5" value="4" onchange="calcIKDC()"> Atividades muito intensas</label>
+                  <label class="q-radio-lbl"><input type="radio" name="ikdc-q5" value="3" onchange="calcIKDC()"> Atividades intensas</label>
+                  <label class="q-radio-lbl"><input type="radio" name="ikdc-q5" value="2" onchange="calcIKDC()"> Atividades moderadas</label>
+                  <label class="q-radio-lbl"><input type="radio" name="ikdc-q5" value="1" onchange="calcIKDC()"> Atividades leves</label>
+                  <label class="q-radio-lbl"><input type="radio" name="ikdc-q5" value="0" onchange="calcIKDC()"> Incapaz de realizar qualquer atividade</label>
+                </div>
+              </div>
+              <!-- Q6 -->
+              <div class="q-item q-item-block"><div class="q-text-block"><span class="q-num">6</span> O joelho travou ou emperrou nas últimas 4 semanas?</div>
+                <div class="q-opts-block" data-name="ikdc-q6">
+                  <label class="q-radio-lbl"><input type="radio" name="ikdc-q6" value="0" onchange="calcIKDC()"> Sim</label>
+                  <label class="q-radio-lbl"><input type="radio" name="ikdc-q6" value="1" onchange="calcIKDC()"> Não</label>
+                </div>
+              </div>
+              <!-- Q7 -->
+              <div class="q-item q-item-block"><div class="q-text-block"><span class="q-num">7</span> Maior nível de atividade sem falseio (giving way) significativo</div>
+                <div class="q-opts-block" data-name="ikdc-q7">
+                  <label class="q-radio-lbl"><input type="radio" name="ikdc-q7" value="4" onchange="calcIKDC()"> Atividades muito intensas</label>
+                  <label class="q-radio-lbl"><input type="radio" name="ikdc-q7" value="3" onchange="calcIKDC()"> Atividades intensas</label>
+                  <label class="q-radio-lbl"><input type="radio" name="ikdc-q7" value="2" onchange="calcIKDC()"> Atividades moderadas</label>
+                  <label class="q-radio-lbl"><input type="radio" name="ikdc-q7" value="1" onchange="calcIKDC()"> Atividades leves</label>
+                  <label class="q-radio-lbl"><input type="radio" name="ikdc-q7" value="0" onchange="calcIKDC()"> Incapaz de realizar qualquer atividade</label>
+                </div>
+              </div>
+              <!-- Q8 -->
+              <div class="q-item q-item-block"><div class="q-text-block"><span class="q-num">8</span> Maior nível de atividade em que participa regularmente</div>
+                <div class="q-opts-block" data-name="ikdc-q8">
+                  <label class="q-radio-lbl"><input type="radio" name="ikdc-q8" value="4" onchange="calcIKDC()"> Atividades muito intensas</label>
+                  <label class="q-radio-lbl"><input type="radio" name="ikdc-q8" value="3" onchange="calcIKDC()"> Atividades intensas</label>
+                  <label class="q-radio-lbl"><input type="radio" name="ikdc-q8" value="2" onchange="calcIKDC()"> Atividades moderadas</label>
+                  <label class="q-radio-lbl"><input type="radio" name="ikdc-q8" value="1" onchange="calcIKDC()"> Atividades leves</label>
+                  <label class="q-radio-lbl"><input type="radio" name="ikdc-q8" value="0" onchange="calcIKDC()"> Incapaz de realizar qualquer atividade</label>
+                </div>
+              </div>
+              <!-- Q9 — 9 sub-itens -->
+              <div class="q-item q-item-block"><div class="q-text-block"><span class="q-num">9</span> Como o joelho afeta sua capacidade de: (0 = não consegue · 4 = sem dificuldade)</div>
+                <div style="overflow-x:auto;margin-top:8px;padding-left:16px">
+                  <table class="t" style="min-width:500px">
+                    <tr><th>Atividade</th><th>Sem dif.</th><th>Pouco</th><th>Moderado</th><th>Extremo</th><th>Incapaz</th></tr>
+                    <tr><td>a. Subir escadas</td>
+                      <td><input type="radio" name="ikdc-q9a" value="4" onchange="calcIKDC()"></td>
+                      <td><input type="radio" name="ikdc-q9a" value="3" onchange="calcIKDC()"></td>
+                      <td><input type="radio" name="ikdc-q9a" value="2" onchange="calcIKDC()"></td>
+                      <td><input type="radio" name="ikdc-q9a" value="1" onchange="calcIKDC()"></td>
+                      <td><input type="radio" name="ikdc-q9a" value="0" onchange="calcIKDC()"></td></tr>
+                    <tr><td>b. Descer escadas</td>
+                      <td><input type="radio" name="ikdc-q9b" value="4" onchange="calcIKDC()"></td>
+                      <td><input type="radio" name="ikdc-q9b" value="3" onchange="calcIKDC()"></td>
+                      <td><input type="radio" name="ikdc-q9b" value="2" onchange="calcIKDC()"></td>
+                      <td><input type="radio" name="ikdc-q9b" value="1" onchange="calcIKDC()"></td>
+                      <td><input type="radio" name="ikdc-q9b" value="0" onchange="calcIKDC()"></td></tr>
+                    <tr><td>c. Ajoelhar na frente do joelho</td>
+                      <td><input type="radio" name="ikdc-q9c" value="4" onchange="calcIKDC()"></td>
+                      <td><input type="radio" name="ikdc-q9c" value="3" onchange="calcIKDC()"></td>
+                      <td><input type="radio" name="ikdc-q9c" value="2" onchange="calcIKDC()"></td>
+                      <td><input type="radio" name="ikdc-q9c" value="1" onchange="calcIKDC()"></td>
+                      <td><input type="radio" name="ikdc-q9c" value="0" onchange="calcIKDC()"></td></tr>
+                    <tr><td>d. Agachar</td>
+                      <td><input type="radio" name="ikdc-q9d" value="4" onchange="calcIKDC()"></td>
+                      <td><input type="radio" name="ikdc-q9d" value="3" onchange="calcIKDC()"></td>
+                      <td><input type="radio" name="ikdc-q9d" value="2" onchange="calcIKDC()"></td>
+                      <td><input type="radio" name="ikdc-q9d" value="1" onchange="calcIKDC()"></td>
+                      <td><input type="radio" name="ikdc-q9d" value="0" onchange="calcIKDC()"></td></tr>
+                    <tr><td>e. Sentar com joelho dobrado</td>
+                      <td><input type="radio" name="ikdc-q9e" value="4" onchange="calcIKDC()"></td>
+                      <td><input type="radio" name="ikdc-q9e" value="3" onchange="calcIKDC()"></td>
+                      <td><input type="radio" name="ikdc-q9e" value="2" onchange="calcIKDC()"></td>
+                      <td><input type="radio" name="ikdc-q9e" value="1" onchange="calcIKDC()"></td>
+                      <td><input type="radio" name="ikdc-q9e" value="0" onchange="calcIKDC()"></td></tr>
+                    <tr><td>f. Levantar de uma cadeira</td>
+                      <td><input type="radio" name="ikdc-q9f" value="4" onchange="calcIKDC()"></td>
+                      <td><input type="radio" name="ikdc-q9f" value="3" onchange="calcIKDC()"></td>
+                      <td><input type="radio" name="ikdc-q9f" value="2" onchange="calcIKDC()"></td>
+                      <td><input type="radio" name="ikdc-q9f" value="1" onchange="calcIKDC()"></td>
+                      <td><input type="radio" name="ikdc-q9f" value="0" onchange="calcIKDC()"></td></tr>
+                    <tr><td>g. Correr em linha reta</td>
+                      <td><input type="radio" name="ikdc-q9g" value="4" onchange="calcIKDC()"></td>
+                      <td><input type="radio" name="ikdc-q9g" value="3" onchange="calcIKDC()"></td>
+                      <td><input type="radio" name="ikdc-q9g" value="2" onchange="calcIKDC()"></td>
+                      <td><input type="radio" name="ikdc-q9g" value="1" onchange="calcIKDC()"></td>
+                      <td><input type="radio" name="ikdc-q9g" value="0" onchange="calcIKDC()"></td></tr>
+                    <tr><td>h. Saltar e aterrar no membro afetado</td>
+                      <td><input type="radio" name="ikdc-q9h" value="4" onchange="calcIKDC()"></td>
+                      <td><input type="radio" name="ikdc-q9h" value="3" onchange="calcIKDC()"></td>
+                      <td><input type="radio" name="ikdc-q9h" value="2" onchange="calcIKDC()"></td>
+                      <td><input type="radio" name="ikdc-q9h" value="1" onchange="calcIKDC()"></td>
+                      <td><input type="radio" name="ikdc-q9h" value="0" onchange="calcIKDC()"></td></tr>
+                    <tr><td>i. Parar e recomeçar rapidamente</td>
+                      <td><input type="radio" name="ikdc-q9i" value="4" onchange="calcIKDC()"></td>
+                      <td><input type="radio" name="ikdc-q9i" value="3" onchange="calcIKDC()"></td>
+                      <td><input type="radio" name="ikdc-q9i" value="2" onchange="calcIKDC()"></td>
+                      <td><input type="radio" name="ikdc-q9i" value="1" onchange="calcIKDC()"></td>
+                      <td><input type="radio" name="ikdc-q9i" value="0" onchange="calcIKDC()"></td></tr>
+                  </table>
+                </div>
+              </div>
+              <!-- Q10 — função atual -->
+              <div class="q-item q-item-block"><div class="q-text-block"><span class="q-num">10</span> Função atual do joelho (0 = incapaz · 10 = sem limitação)</div>
+                <div style="display:flex;align-items:center;gap:10px;padding-left:32px;margin-top:6px">
+                  <span style="font-size:11px;color:#888">0</span>
+                  <input type="range" id="ikdc-q10" min="0" max="10" step="1" value="10" style="flex:1" oninput="document.getElementById('ikdc-q10-v').textContent=this.value;calcIKDC()">
+                  <span style="font-size:11px;color:#888">10</span>
+                  <span id="ikdc-q10-v" style="font-weight:600;min-width:20px">10</span>
+                </div>
+              </div>
+            </div>
+            <input type="hidden" id="ikdc">
           </div>
 
-          <!-- ── HOOS ── -->
+          <!-- ── HOOS (score manual) ── -->
           <div class="card" style="margin-bottom:14px">
             <div class="card-title"><i class="ti ti-activity"></i> HOOS — Hip disability &amp; Osteoarthritis Outcome Score</div>
+            <p style="font-size:12px;color:#888;margin-bottom:8px">Insira os scores de cada subescala (0–100).</p>
             <table class="t">
               <tr><th>Subescala</th><th>Score (0–100)</th></tr>
               <tr><td>Sintomas</td><td><input type="number" id="hoos-sint" min="0" max="100" step="0.1"></td></tr>
@@ -595,14 +846,58 @@
             </table>
           </div>
 
-          <!-- ── FAAM ── -->
+          <!-- ══════════════════════════════════════════════════════ -->
+          <!-- FAAM COMPLETO -->
+          <!-- ══════════════════════════════════════════════════════ -->
           <div class="card" style="margin-bottom:14px">
-            <div class="card-title"><i class="ti ti-activity"></i> FAAM — Foot and Ankle Ability Measure</div>
-            <table class="t">
-              <tr><th>Subescala</th><th>Score (0–100)</th></tr>
-              <tr><td>AVD</td><td><input type="number" id="faam-avd" min="0" max="100" step="0.1"></td></tr>
-              <tr><td>Esporte</td><td><input type="number" id="faam-esp" min="0" max="100" step="0.1"></td></tr>
-            </table>
+            <div class="card-title"><i class="ti ti-walk"></i> FAAM — Foot and Ankle Ability Measure</div>
+            <p style="font-size:12px;color:#888;margin-bottom:10px">AVD (21 itens) + Esporte (8 itens). Score 0–100 calculado automaticamente. N/A = não aplicável (não conta).</p>
+            <div style="display:flex;flex-wrap:wrap;gap:10px;margin-bottom:12px">
+              <div class="escala-resultado" id="faam-avd-r">AVD: —</div>
+              <div class="escala-resultado" id="faam-esp-r">Esporte: —</div>
+            </div>
+
+            <div class="q-group">
+              <div class="q-group-title">AVD — Atividades de vida diária (0 = incapaz · 4 = sem dificuldade · N/A = não aplicável)</div>
+              <div class="q-list" id="faam-avd-list">
+                <div class="q-item q-item-block"><div class="q-text-block"><span class="q-num">1</span> Ficar de pé</div><div class="q-opts" data-name="fa-avd1" data-labels="Incapaz,Extrema,Moderada,Leve,Sem dificuldade" data-na="1"></div></div>
+                <div class="q-item q-item-block"><div class="q-text-block"><span class="q-num">2</span> Caminhar em superfície plana</div><div class="q-opts" data-name="fa-avd2" data-labels="Incapaz,Extrema,Moderada,Leve,Sem dificuldade" data-na="1"></div></div>
+                <div class="q-item q-item-block"><div class="q-text-block"><span class="q-num">3</span> Caminhar em superfície plana sem sapatos</div><div class="q-opts" data-name="fa-avd3" data-labels="Incapaz,Extrema,Moderada,Leve,Sem dificuldade" data-na="1"></div></div>
+                <div class="q-item q-item-block"><div class="q-text-block"><span class="q-num">4</span> Subir ladeiras</div><div class="q-opts" data-name="fa-avd4" data-labels="Incapaz,Extrema,Moderada,Leve,Sem dificuldade" data-na="1"></div></div>
+                <div class="q-item q-item-block"><div class="q-text-block"><span class="q-num">5</span> Descer ladeiras</div><div class="q-opts" data-name="fa-avd5" data-labels="Incapaz,Extrema,Moderada,Leve,Sem dificuldade" data-na="1"></div></div>
+                <div class="q-item q-item-block"><div class="q-text-block"><span class="q-num">6</span> Subir escadas</div><div class="q-opts" data-name="fa-avd6" data-labels="Incapaz,Extrema,Moderada,Leve,Sem dificuldade" data-na="1"></div></div>
+                <div class="q-item q-item-block"><div class="q-text-block"><span class="q-num">7</span> Descer escadas</div><div class="q-opts" data-name="fa-avd7" data-labels="Incapaz,Extrema,Moderada,Leve,Sem dificuldade" data-na="1"></div></div>
+                <div class="q-item q-item-block"><div class="q-text-block"><span class="q-num">8</span> Caminhar em superfície irregular</div><div class="q-opts" data-name="fa-avd8" data-labels="Incapaz,Extrema,Moderada,Leve,Sem dificuldade" data-na="1"></div></div>
+                <div class="q-item q-item-block"><div class="q-text-block"><span class="q-num">9</span> Subir e descer meios-fios</div><div class="q-opts" data-name="fa-avd9" data-labels="Incapaz,Extrema,Moderada,Leve,Sem dificuldade" data-na="1"></div></div>
+                <div class="q-item q-item-block"><div class="q-text-block"><span class="q-num">10</span> Agachar</div><div class="q-opts" data-name="fa-avd10" data-labels="Incapaz,Extrema,Moderada,Leve,Sem dificuldade" data-na="1"></div></div>
+                <div class="q-item q-item-block"><div class="q-text-block"><span class="q-num">11</span> Ficar na ponta dos pés</div><div class="q-opts" data-name="fa-avd11" data-labels="Incapaz,Extrema,Moderada,Leve,Sem dificuldade" data-na="1"></div></div>
+                <div class="q-item q-item-block"><div class="q-text-block"><span class="q-num">12</span> Caminhada inicial</div><div class="q-opts" data-name="fa-avd12" data-labels="Incapaz,Extrema,Moderada,Leve,Sem dificuldade" data-na="1"></div></div>
+                <div class="q-item q-item-block"><div class="q-text-block"><span class="q-num">13</span> Caminhar 5 minutos ou menos</div><div class="q-opts" data-name="fa-avd13" data-labels="Incapaz,Extrema,Moderada,Leve,Sem dificuldade" data-na="1"></div></div>
+                <div class="q-item q-item-block"><div class="q-text-block"><span class="q-num">14</span> Caminhar aproximadamente 10 minutos</div><div class="q-opts" data-name="fa-avd14" data-labels="Incapaz,Extrema,Moderada,Leve,Sem dificuldade" data-na="1"></div></div>
+                <div class="q-item q-item-block"><div class="q-text-block"><span class="q-num">15</span> Caminhar 15 minutos ou mais</div><div class="q-opts" data-name="fa-avd15" data-labels="Incapaz,Extrema,Moderada,Leve,Sem dificuldade" data-na="1"></div></div>
+                <div class="q-item q-item-block"><div class="q-text-block"><span class="q-num">16</span> Tarefas domésticas</div><div class="q-opts" data-name="fa-avd16" data-labels="Incapaz,Extrema,Moderada,Leve,Sem dificuldade" data-na="1"></div></div>
+                <div class="q-item q-item-block"><div class="q-text-block"><span class="q-num">17</span> Atividades da vida diária</div><div class="q-opts" data-name="fa-avd17" data-labels="Incapaz,Extrema,Moderada,Leve,Sem dificuldade" data-na="1"></div></div>
+                <div class="q-item q-item-block"><div class="q-text-block"><span class="q-num">18</span> Cuidados pessoais</div><div class="q-opts" data-name="fa-avd18" data-labels="Incapaz,Extrema,Moderada,Leve,Sem dificuldade" data-na="1"></div></div>
+                <div class="q-item q-item-block"><div class="q-text-block"><span class="q-num">19</span> Trabalho leve a moderado (ficar em pé, caminhar)</div><div class="q-opts" data-name="fa-avd19" data-labels="Incapaz,Extrema,Moderada,Leve,Sem dificuldade" data-na="1"></div></div>
+                <div class="q-item q-item-block"><div class="q-text-block"><span class="q-num">20</span> Trabalho pesado (empurrar, puxar, escalar, carregar)</div><div class="q-opts" data-name="fa-avd20" data-labels="Incapaz,Extrema,Moderada,Leve,Sem dificuldade" data-na="1"></div></div>
+                <div class="q-item q-item-block"><div class="q-text-block"><span class="q-num">21</span> Atividades recreativas</div><div class="q-opts" data-name="fa-avd21" data-labels="Incapaz,Extrema,Moderada,Leve,Sem dificuldade" data-na="1"></div></div>
+              </div>
+            </div>
+
+            <div class="q-group" style="margin-top:10px">
+              <div class="q-group-title">Esporte — dificuldade por causa do tornozelo/pé</div>
+              <div class="q-list">
+                <div class="q-item q-item-block"><div class="q-text-block"><span class="q-num">1</span> Correr</div><div class="q-opts" data-name="fa-esp1" data-labels="Incapaz,Extrema,Moderada,Leve,Sem dificuldade" data-na="1"></div></div>
+                <div class="q-item q-item-block"><div class="q-text-block"><span class="q-num">2</span> Saltar</div><div class="q-opts" data-name="fa-esp2" data-labels="Incapaz,Extrema,Moderada,Leve,Sem dificuldade" data-na="1"></div></div>
+                <div class="q-item q-item-block"><div class="q-text-block"><span class="q-num">3</span> Aterrar (landing)</div><div class="q-opts" data-name="fa-esp3" data-labels="Incapaz,Extrema,Moderada,Leve,Sem dificuldade" data-na="1"></div></div>
+                <div class="q-item q-item-block"><div class="q-text-block"><span class="q-num">4</span> Parar e recomeçar rapidamente</div><div class="q-opts" data-name="fa-esp4" data-labels="Incapaz,Extrema,Moderada,Leve,Sem dificuldade" data-na="1"></div></div>
+                <div class="q-item q-item-block"><div class="q-text-block"><span class="q-num">5</span> Corte / movimentos laterais</div><div class="q-opts" data-name="fa-esp5" data-labels="Incapaz,Extrema,Moderada,Leve,Sem dificuldade" data-na="1"></div></div>
+                <div class="q-item q-item-block"><div class="q-text-block"><span class="q-num">6</span> Atividades de baixo impacto</div><div class="q-opts" data-name="fa-esp6" data-labels="Incapaz,Extrema,Moderada,Leve,Sem dificuldade" data-na="1"></div></div>
+                <div class="q-item q-item-block"><div class="q-text-block"><span class="q-num">7</span> Capacidade de praticar com técnica normal</div><div class="q-opts" data-name="fa-esp7" data-labels="Incapaz,Extrema,Moderada,Leve,Sem dificuldade" data-na="1"></div></div>
+                <div class="q-item q-item-block"><div class="q-text-block"><span class="q-num">8</span> Capacidade de participar pelo tempo desejado</div><div class="q-opts" data-name="fa-esp8" data-labels="Incapaz,Extrema,Moderada,Leve,Sem dificuldade" data-na="1"></div></div>
+              </div>
+            </div>
+            <input type="hidden" id="faam-avd"><input type="hidden" id="faam-esp">
           </div>
 
           <!-- ══════════════════════════════════════════════════════ -->
