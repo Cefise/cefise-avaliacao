@@ -982,3 +982,134 @@ clearForm = function() {
   // Limpa NDI hidden
   ['ndi'].forEach(id => { const el=document.getElementById(id); if(el) el.value=''; });
 };
+
+// ─── KOOS / IKDC / FAAM — QUESTIONÁRIOS COMPLETOS ────────────
+
+// Inicializa todos os botões de opção com data-name e data-labels
+function initKOOS_IKDC_FAAM() {
+  document.querySelectorAll('[data-labels]').forEach(container => {
+    const labels = container.dataset.labels.split(',');
+    const name   = container.dataset.name;
+    const hasNA  = container.dataset.na === '1';
+    const isReverse = container.dataset.reverse === '1';
+    container.innerHTML = '';
+    // valores: 0=pior → 4=melhor (padrão), reverse inverte display mas não valor
+    labels.forEach((lbl, i) => {
+      const val = isReverse ? i : i; // valor = posição (0..4), score = 4-val
+      const btn = document.createElement('button');
+      btn.type = 'button';
+      btn.className = 'q-opt-btn';
+      btn.textContent = lbl.trim();
+      btn.dataset.val = val;
+      btn.onclick = () => {
+        container.querySelectorAll('.q-opt-btn').forEach(b => b.classList.remove('selected'));
+        btn.classList.add('selected');
+        recalcAll();
+      };
+      container.appendChild(btn);
+    });
+    if (hasNA) {
+      const na = document.createElement('button');
+      na.type = 'button'; na.className = 'q-opt-btn'; na.textContent = 'N/A'; na.dataset.val = 'na';
+      na.onclick = () => {
+        container.querySelectorAll('.q-opt-btn').forEach(b => b.classList.remove('selected'));
+        na.classList.add('selected');
+        recalcAll();
+      };
+      container.appendChild(na);
+    }
+  });
+}
+
+// Pontuação KOOS: score = (4 - valor_selecionado). S4,S5 são invertidas no display mas mesma lógica.
+function calcKOOS() {
+  const groups = {
+    sint:   ['ks-s1','ks-s2','ks-s3','ks-s4','ks-s5','ks-s6','ks-s7'],
+    dor:    ['ks-p1','ks-p2','ks-p3','ks-p4','ks-p5','ks-p6','ks-p7','ks-p8','ks-p9'],
+    avd:    ['ks-a1','ks-a2','ks-a3','ks-a4','ks-a5','ks-a6','ks-a7','ks-a8','ks-a9','ks-a10','ks-a11','ks-a12','ks-a13','ks-a14','ks-a15','ks-a16','ks-a17'],
+    esporte:['ks-sp1','ks-sp2','ks-sp3','ks-sp4','ks-sp5'],
+    qv:     ['ks-q1','ks-q2','ks-q3','ks-q4'],
+  };
+  const ids  = { sint:'koos-sint', dor:'koos-dor', avd:'koos-avd', esporte:'koos-esporte', qv:'koos-qv' };
+  const disp = { sint:'koos-sint-r', dor:'koos-dor-r', avd:'koos-avd-r', esporte:'koos-esporte-r', qv:'koos-qv-r' };
+  const names = { sint:'Sintomas', dor:'Dor', avd:'AVD', esporte:'Esporte', qv:'QV' };
+
+  for (const [key, names_arr] of Object.entries(groups)) {
+    const vals = names_arr.map(n => {
+      const sel = document.querySelector(`[data-name="${n}"] .q-opt-btn.selected`);
+      return (sel && sel.dataset.val !== 'na') ? parseInt(sel.dataset.val) : null;
+    }).filter(v => v !== null);
+    const el   = document.getElementById(disp[key]);
+    const hid  = document.getElementById(ids[key]);
+    if (!vals.length) { if(el) el.textContent = `${names[key]}: —`; if(hid) hid.value=''; continue; }
+    const score = ((4*vals.length - vals.reduce((a,b)=>a+b,0)) / (4*vals.length)) * 100;
+    const r = Math.round(score * 10)/10;
+    if(el)  el.textContent  = `${names[key]}: ${r.toFixed(0)}`;
+    if(hid) hid.value = r;
+  }
+}
+
+function calcIKDC() {
+  // Q2 e Q3: slider já retorna 0-10 (Q2 e Q3 são reverse: Constant=0, Never=10)
+  const q2v = parseInt(document.getElementById('ikdc-q2')?.value || 10);
+  const q3v = parseInt(document.getElementById('ikdc-q3')?.value || 10);
+  // Q10: slider 0-10
+  const q10v = parseInt(document.getElementById('ikdc-q10')?.value || 10);
+
+  const radioGroups = ['ikdc-q1','ikdc-q4','ikdc-q5','ikdc-q6','ikdc-q7','ikdc-q8',
+                       'ikdc-q9a','ikdc-q9b','ikdc-q9c','ikdc-q9d','ikdc-q9e','ikdc-q9f','ikdc-q9g','ikdc-q9h','ikdc-q9i'];
+  const maxMap = { 'ikdc-q1':4,'ikdc-q4':4,'ikdc-q5':4,'ikdc-q6':1,'ikdc-q7':4,'ikdc-q8':4,
+                   'ikdc-q9a':4,'ikdc-q9b':4,'ikdc-q9c':4,'ikdc-q9d':4,'ikdc-q9e':4,'ikdc-q9f':4,'ikdc-q9g':4,'ikdc-q9h':4,'ikdc-q9i':4 };
+
+  let sum = q2v + q3v + q10v;
+  let maxPossible = 10 + 10 + 10;
+  let allAnswered = true;
+
+  for (const name of radioGroups) {
+    const sel = document.querySelector(`input[name="${name}"]:checked`);
+    if (!sel) { allAnswered = false; continue; }
+    sum += parseInt(sel.value);
+    maxPossible += maxMap[name];
+  }
+
+  const el  = document.getElementById('ikdc-resultado');
+  const hid = document.getElementById('ikdc');
+  if (!allAnswered) { if(el) el.textContent='Score: (responda todas as questões)'; return; }
+  const score = Math.round((sum / maxPossible) * 1000) / 10;
+  if(el)  el.textContent = `Score: ${score.toFixed(1)} / 100`;
+  if(hid) hid.value = score;
+}
+
+function calcFAAM() {
+  const avdNames = ['fa-avd1','fa-avd2','fa-avd3','fa-avd4','fa-avd5','fa-avd6','fa-avd7',
+                    'fa-avd8','fa-avd9','fa-avd10','fa-avd11','fa-avd12','fa-avd13','fa-avd14',
+                    'fa-avd15','fa-avd16','fa-avd17','fa-avd18','fa-avd19','fa-avd20','fa-avd21'];
+  const espNames = ['fa-esp1','fa-esp2','fa-esp3','fa-esp4','fa-esp5','fa-esp6','fa-esp7','fa-esp8'];
+
+  function calcSubescala(names, dispId, hidId) {
+    let sum=0, max=0;
+    names.forEach(n => {
+      const sel = document.querySelector(`[data-name="${n}"] .q-opt-btn.selected`);
+      if (!sel || sel.dataset.val === 'na') return;
+      const v = parseInt(sel.dataset.val); // 0=incapaz, 1, 2, 3, 4=sem dif
+      sum += v; max += 4;
+    });
+    const el  = document.getElementById(dispId);
+    const hid = document.getElementById(hidId);
+    if (!max) { if(el) el.textContent=dispId.includes('avd')?'AVD: —':'Esporte: —'; if(hid) hid.value=''; return; }
+    const score = Math.round((sum/max)*1000)/10;
+    if(el)  el.textContent = `${dispId.includes('avd')?'AVD':'Esporte'}: ${score.toFixed(0)}`;
+    if(hid) hid.value = score;
+  }
+
+  calcSubescala(avdNames, 'faam-avd-r', 'faam-avd');
+  calcSubescala(espNames, 'faam-esp-r', 'faam-esp');
+}
+
+function recalcAll() { calcKOOS(); calcIKDC(); calcFAAM(); }
+
+// Inicia ao carregar — encadeia com initDASH existente
+const _origDOMLoaded = window._domLoadedFired;
+document.addEventListener('DOMContentLoaded', () => {
+  initKOOS_IKDC_FAAM();
+});
