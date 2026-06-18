@@ -1405,3 +1405,42 @@ clearForm = function() {
     .forEach(r => { const el=document.getElementById('reg-'+r); if(el) el.checked=false; });
   applyRegioes();
 };
+
+// ─── ACL-RSI COMPLETO ─────────────────────────────────────────
+function calcACLRSI() {
+  let sum = 0;
+  for (let i = 1; i <= 12; i++) {
+    const el = document.getElementById(`aclrsi-q${i}`);
+    const vEl = document.getElementById(`aclrsi-q${i}v`);
+    if (!el) continue;
+    const v = parseInt(el.value);
+    if (vEl) vEl.textContent = v;
+    sum += v;
+  }
+  const score = Math.round(sum / 12);
+  const hidden = document.getElementById('aclrsi');
+  const res = document.getElementById('aclrsi-resultado');
+  const cls = document.getElementById('aclrsi-class');
+  if (hidden) hidden.value = score;
+  if (res) {
+    res.textContent = `Score: ${score} / 100`;
+    res.style.background = score > 75 ? '#E1F5EE' : score >= 66 ? '#E1F5EE' : score >= 50 ? '#FEF3C7' : '#FEE2E2';
+    res.style.color = score > 75 ? '#0F6E56' : score >= 66 ? '#1D9E75' : score >= 50 ? '#92400E' : '#991B1B';
+  }
+  if (cls) {
+    if (score > 75) cls.textContent = '✅ Alta prontidão para retorno ao esporte (> 75)';
+    else if (score >= 66) cls.textContent = '🟢 Boa prontidão (66–75)';
+    else if (score >= 50) cls.textContent = '⚠️ Prontidão moderada (50–65)';
+    else cls.textContent = '❌ Baixa prontidão psicológica (< 50)';
+  }
+}
+
+// Inicializar sliders ACL-RSI ao carregar
+document.addEventListener('DOMContentLoaded', () => {
+  // Sincronizar displays iniciais
+  for (let i = 1; i <= 12; i++) {
+    const el = document.getElementById(`aclrsi-q${i}`);
+    const vEl = document.getElementById(`aclrsi-q${i}v`);
+    if (el && vEl) vEl.textContent = el.value;
+  }
+});
