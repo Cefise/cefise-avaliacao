@@ -1113,3 +1113,295 @@ const _origDOMLoaded = window._domLoadedFired;
 document.addEventListener('DOMContentLoaded', () => {
   initKOOS_IKDC_FAAM();
 });
+
+// ─── EVA COLORIDA ─────────────────────────────────────────────
+function selectEVA(val) {
+  document.querySelectorAll('.eva-btn').forEach(b => b.classList.remove('selected'));
+  const btn = document.querySelector(`.eva-btn[data-val="${val}"]`);
+  if (btn) btn.classList.add('selected');
+  const hidden = document.getElementById('eva-valor');
+  if (hidden) hidden.value = val;
+}
+
+// ─── FILTRO POR REGIÕES ───────────────────────────────────────
+const REGIAO_MAP = {
+  // regiao → quais data-regioes nos cards devem aparecer
+  joelho:    ['joelho'],
+  quadril:   ['quadril'],
+  tornozelo: ['tornozelo'],
+  lombar:    ['lombar'],
+  toracica:  ['toracica','lombar'],
+  cervical:  ['cervical'],
+  ombro:     ['ombro','ombro,cotovelo'],
+  cotovelo:  ['cotovelo','ombro,cotovelo'],
+  muscular:  ['muscular'],
+  rtp:       ['rtp','joelho'],
+};
+
+function applyRegioes() {
+  const regioes = ['joelho','quadril','tornozelo','lombar','toracica','cervical','ombro','cotovelo','muscular','rtp'];
+  const selected = regioes.filter(r => document.getElementById('reg-'+r)?.checked);
+
+  // Nenhuma selecionada = mostra tudo
+  if (selected.length === 0) {
+    document.querySelectorAll('.regiao-block').forEach(el => el.classList.remove('hidden-region'));
+    return;
+  }
+
+  // Quais tags de data-regioes estão ativas
+  const activeTags = new Set();
+  selected.forEach(r => {
+    (REGIAO_MAP[r] || [r]).forEach(tag => activeTags.add(tag));
+    activeTags.add(r);
+  });
+
+  document.querySelectorAll('.regiao-block').forEach(el => {
+    const tags = (el.dataset.regioes || '').split(',').map(t => t.trim());
+    const visible = tags.some(t => activeTags.has(t));
+    el.classList.toggle('hidden-region', !visible);
+  });
+
+  // Salvar regiões selecionadas para uso no PDF
+  window._regioesSelecionadas = selected;
+}
+
+// ─── PDF COM GRÁFICOS E INTERPRETAÇÃO ─────────────────────────
+async function gerarPDF() {
+  const pacId = document.getElementById('rel-paciente')?.value;
+  if (!pacId) { toast('Selecione um paciente'); return; }
+  const db = getDB();
+  const pac = db.pacientes.find(p => p.id === parseInt(pacId));
+  const avals = db.avaliacoes.filter(a => a.paciente_id === parseInt(pacId)).sort((a,b)=>a.data.localeCompare(b.data));
+  if (!pac || !avals.length) { toast('Sem dados para gerar PDF'); return; }
+
+  const { jsPDF } = window.jspdf;
+  const doc = new jsPDF({ orientation:'portrait', unit:'mm', format:'a4' });
+  const last = avals[avals.length-1], first = avals[0], hasReav = avals.length > 1;
+  const W = 210, mg = 16; let y = 0;
+  const prof = db.profissionais.find(p => p.id === last.profissional_id);
+  const G = [29,158,117], R = [226,75,74], A = [186,117,23];
+
+  // ── Cabeçalho ──
+  doc.setFillColor(30,107,40); doc.rect(0,0,W,30,'F');
+  doc.setTextColor(255,255,255); doc.setFontSize(17); doc.setFont(undefined,'bold');
+  doc.text('Cefise Academy',mg,12);
+  doc.setFontSize(10); doc.setFont(undefined,'normal');
+  doc.text('Relatório de Avaliação Clínica',mg,19);
+  doc.text(`Gerado em ${new Date().toLocaleString('pt-BR')}`,mg,25); y = 38;
+
+  doc.setTextColor(30,107,40); doc.setFontSize(14); doc.setFont(undefined,'bold');
+  doc.text(pac.nome, mg, y); y+=7;
+  doc.setTextColor(60,60,60); doc.setFontSize(10); doc.setFont(undefined,'normal');
+  doc.text(`Nasc: ${fmtDate(pac.nasc)} · ${pac.altura||'—'}m · ${pac.peso||'—'}kg · Prof: ${prof?.nome||'—'}`, mg, y); y+=6;
+  if (last.esporte) { doc.text(`Modalidade: ${last.esporte}${last.semana_lesao?` · Semana pós-lesão: ${last.semana_lesao}`:''}`, mg, y); y+=6; }
+  doc.text(`Data: ${fmtDate(last.data)} · Tipo: ${last.tipo==='avaliacao'?'Avaliação inicial':'Reavaliação'}`, mg, y); y+=10;
+  if (last.eva) { doc.text(`EVA — Dor: ${last.eva}/10`, mg, y); y+=8; }
+
+  // ── Função auxiliar ──
+  const n = v => v ? Number(v).toFixed(1) : '—';
+  function section(title, color=[30,107,40]) {
+    if (y > 260) { doc.addPage(); y = 16; }
+    doc.setFillColor(...color, 30);
+    doc.setFillColor(232,245,233);
+    doc.rect(mg-2, y-5, W-mg*2+4, 8, 'F');
+    doc.setTextColor(...color); doc.setFontSize(11); doc.setFont(undefined,'bold');
+    doc.text(title, mg, y); y+=9;
+    doc.setTextColor(50,50,50); doc.setFont(undefined,'normal'); doc.setFontSize(10);
+  }
+  function row(label, val, color=null) {
+    if (y > 270) { doc.addPage(); y = 16; }
+    doc.text(`${label}:`, mg, y);
+    if (color) doc.setTextColor(...color);
+    doc.text(String(val||'—'), 145, y);
+    doc.setTextColor(50,50,50);
+    y += 5.5;
+  }
+  function lsiColor(lsi) {
+    if (!lsi || isNaN(lsi)) return null;
+    const v = parseFloat(lsi);
+    return v >= 90 ? G : v >= 80 ? A : R;
+  }
+  function interp(label, val, unit, okMin, okMax, higherBetter=true) {
+    if (!val) return;
+    const v = parseFloat(val);
+    let color, txt;
+    if (higherBetter) {
+      if (v >= okMin) { color=G; txt='Dentro do esperado'; }
+      else if (v >= okMin*0.8) { color=A; txt='Abaixo do ideal — atenção'; }
+      else { color=R; txt='Déficit significativo'; }
+    } else {
+      if (v <= okMax) { color=G; txt='Dentro do esperado'; }
+      else { color=R; txt='Acima do limite — déficit'; }
+    }
+    row(`  ${label}`, `${n(val)}${unit} — ${txt}`, color);
+  }
+
+  // ── Força ──
+  section('Força muscular');
+  interp('Nordic Hamstring', last.nordic, ' reps', 10, null);
+  interp('One-sided Squat D', last.squat_d, ' reps', 20, null);
+  interp('One-sided Squat E', last.squat_e, ' reps', 20, null);
+  const sqLSI = last.squat_d&&last.squat_e ? (Math.min(last.squat_d,last.squat_e)/Math.max(last.squat_d,last.squat_e)*100).toFixed(1) : null;
+  if (sqLSI) row('  LSI Squat', sqLSI+'%', lsiColor(sqLSI));
+  interp('Single Leg Bridge D', last.bridge_d, ' reps', 25, null);
+  interp('Single Leg Bridge E', last.bridge_e, ' reps', 25, null);
+  interp('Copenhagen D', last.copenh_d, ' reps', 15, null);
+  interp('Core D', last.core_d, ' s', 60, null);
+  y += 4;
+
+  // ── Gráfico de barras D×E (força) ──
+  if (last.squat_d || last.squat_e || last.bridge_d || last.bridge_e) {
+    if (y > 200) { doc.addPage(); y = 16; }
+    doc.setFontSize(10); doc.setFont(undefined,'bold'); doc.setTextColor(30,107,40);
+    doc.text('Gráfico — Força D × E', mg, y); y += 6;
+    const forceItems = [
+      ['Squat D', last.squat_d, 'D'], ['Squat E', last.squat_e, 'E'],
+      ['Bridge D', last.bridge_d, 'D'], ['Bridge E', last.bridge_e, 'E'],
+      ['Copenh D', last.copenh_d, 'D'], ['Copenh E', last.copenh_e, 'E'],
+    ].filter(i => i[1]);
+    const maxVal = Math.max(...forceItems.map(i => parseFloat(i[1])||0), 1);
+    const barW = (W - mg*2 - 40) / forceItems.length;
+    const chartH = 30;
+    forceItems.forEach((item, idx) => {
+      const v = parseFloat(item[1]) || 0;
+      const bh = (v / maxVal) * chartH;
+      const x = mg + 20 + idx * barW;
+      const isD = item[2] === 'D';
+      isD ? doc.setFillColor(...G) : doc.setFillColor(0,105,92);
+      doc.rect(x, y + chartH - bh, barW*0.7, bh, 'F');
+      doc.setFontSize(7); doc.setTextColor(60,60,60);
+      doc.text(item[0], x, y + chartH + 4, {maxWidth: barW});
+      doc.text(String(Math.round(v)), x, y + chartH - bh - 1);
+    });
+    y += chartH + 12;
+  }
+
+  // ── Hop Tests / LSI ──
+  section('Hop Tests — LSI');
+  const hopTests = [
+    ['Single Hop', last.sht_avg_d, last.sht_avg_e, last.lsi_sht],
+    ['Triple Hop', last.tht_avg_d, last.tht_avg_e, last.lsi_tht],
+    ['Crossover', last.cot_avg_d, last.cot_avg_e, last.lsi_cot],
+    ['Side Hop', last.sidehop_d, last.sidehop_e, last.lsi_sidehop],
+  ].filter(h => h[1] || h[2]);
+
+  hopTests.forEach(([nm, d, e, lsi]) => {
+    const lv = lsi ? parseFloat(lsi) : (d&&e ? (Math.min(d,e)/Math.max(d,e)*100) : null);
+    const c = lsiColor(lv);
+    row(`  ${nm}`, `D=${n(d)} / E=${n(e)} / LSI=${lv?lv.toFixed(1)+'%':'—'}`, c);
+  });
+
+  // Gráfico radar LSI
+  if (hopTests.length >= 2 && y < 230) {
+    if (y > 200) { doc.addPage(); y = 16; }
+    doc.setFontSize(10); doc.setFont(undefined,'bold'); doc.setTextColor(30,107,40);
+    doc.text('Radar — LSI Hop Tests (%)', mg, y); y += 6;
+    // Desenhar radar simples em canvas via HTML2Canvas não está disponível — usar barras horizontais como alternativa
+    hopTests.forEach(([nm, d, e, lsi]) => {
+      const lv = lsi ? parseFloat(lsi) : (d&&e ? (Math.min(d,e)/Math.max(d,e)*100) : null);
+      if (!lv) return;
+      const barMaxW = W - mg*2 - 50;
+      const filled = (Math.min(lv, 100) / 100) * barMaxW;
+      const c = lsiColor(lv);
+      doc.setFillColor(220,220,220); doc.rect(mg+45, y-3, barMaxW, 5, 'F');
+      doc.setFillColor(...c); doc.rect(mg+45, y-3, filled, 5, 'F');
+      doc.setFontSize(9); doc.setTextColor(60,60,60);
+      doc.text(nm, mg, y);
+      doc.setTextColor(...c); doc.setFont(undefined,'bold');
+      doc.text(`${lv.toFixed(1)}%`, mg+45+filled+2, y);
+      doc.setFont(undefined,'normal'); doc.setTextColor(60,60,60);
+      // Linha de referência 90%
+      const ref90 = (90/100)*barMaxW;
+      doc.setDrawColor(200,0,0); doc.setLineWidth(0.3);
+      doc.line(mg+45+ref90, y-4, mg+45+ref90, y+2);
+      y += 8;
+    });
+    doc.setFontSize(8); doc.setTextColor(150,150,150);
+    doc.text('Linha vermelha = 90% (limiar RTP)', mg, y); y += 8;
+  }
+
+  // ── Saltos ──
+  if (last.cmj_best || last.dj_rsi) {
+    section('Saltos');
+    interp('CMJ — melhor tentativa', last.cmj_best, ' cm', 35, null);
+    if (last.dj_rsi) row('Drop Jump RSI', n(last.dj_rsi), parseFloat(last.dj_rsi)>=1.5?G:R);
+    y += 4;
+  }
+
+  // ── FMS ──
+  if (last.fms_total) {
+    section('FMS — Functional Movement Screen');
+    const fv = parseInt(last.fms_total);
+    row('  Total FMS', `${fv}/21`, fv>=14?G:fv>=10?A:R);
+    const fmsInterp = fv>=14?'Padrões de movimento adequados':'Risco aumentado de lesão — trabalhar padrões deficientes';
+    row('  Interpretação', fmsInterp, fv>=14?G:R); y+=4;
+  }
+
+  // ── Escalas ──
+  const escalas = [];
+  if (last.koos_dor) escalas.push(['KOOS dor', last.koos_dor, '%', 80, null, true]);
+  if (last.koos_esporte) escalas.push(['KOOS Esporte', last.koos_esporte, '%', 70, null, true]);
+  if (last.ikdc) escalas.push(['IKDC', last.ikdc, '/100', 75, null, true]);
+  if (last.hoos_dor) escalas.push(['HOOS dor', last.hoos_dor, '%', 80, null, true]);
+  if (last.odi) escalas.push(['ODI', last.odi, '%', null, 20, false]);
+  if (last.ndi) escalas.push(['NDI', last.ndi, '%', null, 8, false]);
+  if (last.dash) escalas.push(['DASH', last.dash, '/100', null, 20, false]);
+  if (last.visap) escalas.push(['VISA-P', last.visap, '/100', 80, null, true]);
+  if (last.visaa) escalas.push(['VISA-A', last.visaa, '/100', 80, null, true]);
+  if (escalas.length) {
+    section('Escalas funcionais');
+    escalas.forEach(([lbl, val, unit, okMin, okMax, higher]) => {
+      interp(lbl, val, unit, okMin, okMax, higher);
+    });
+    y += 4;
+  }
+
+  // ── RTP ──
+  if (last.aclrsi || last.rtp_decisao) {
+    section('Retorno Esportivo (RTP)');
+    const rtpCount = [last.rtp_lsi,last.rtp_forca,last.rtp_dor,last.rtp_edema,last.rtp_psico,last.rtp_tempo,last.rtp_agilidade,last.rtp_treino].filter(Boolean).length;
+    row('  Critérios cumpridos', `${rtpCount}/8`, rtpCount>=7?G:rtpCount>=5?A:R);
+    if (last.aclrsi) row('  ACL-RSI', `${n(last.aclrsi)}/100`, parseFloat(last.aclrsi)>=65?G:parseFloat(last.aclrsi)>=35?A:R);
+    const map={liberado:'✅ Liberado',condicionado:'⚠️ Com restrições',nao_liberado:'❌ Não liberado',em_progresso:'🔄 Em progresso'};
+    if (last.rtp_decisao) row('  Decisão', map[last.rtp_decisao]||last.rtp_decisao);
+    if (last.rtp_data) row('  Data prevista', fmtDate(last.rtp_data));
+    y += 4;
+  }
+
+  // ── Notas ──
+  if (last.nota_rtp||last.nota_forca||last.nota_testes||last.nota_mobilidade) {
+    section('Notas clínicas');
+    [['Testes',last.nota_testes],['Força',last.nota_forca],['Mobilidade',last.nota_mobilidade],['RTP',last.nota_rtp]].forEach(([t,n])=>{
+      if (!n) return;
+      if (y>262){doc.addPage();y=16;}
+      doc.setFont(undefined,'bold'); doc.text(`${t}:`,mg,y); doc.setFont(undefined,'normal'); y+=5;
+      const lines=doc.splitTextToSize(n,W-mg*2);
+      lines.forEach(l=>{if(y>270){doc.addPage();y=16;}doc.text(l,mg,y);y+=5;});
+      y+=2;
+    });
+  }
+
+  // ── Rodapé ──
+  const pages = doc.internal.getNumberOfPages();
+  for (let i=1;i<=pages;i++){
+    doc.setPage(i);
+    doc.setFontSize(8); doc.setTextColor(180,180,170);
+    doc.text(`Cefise Academy — Página ${i}/${pages}`, mg, 290);
+    doc.text(new Date().toLocaleDateString('pt-BR'), W-mg, 290, {align:'right'});
+  }
+
+  doc.save(`Avaliacao_${pac.nome.replace(/\s+/g,'_')}_${last.data}.pdf`);
+  toast('PDF gerado com sucesso!');
+}
+
+// ─── LIMPAR EVA no clearForm ──────────────────────────────────
+const _clearFormWithEVA = clearForm;
+clearForm = function() {
+  _clearFormWithEVA();
+  document.querySelectorAll('.eva-btn').forEach(b => b.classList.remove('selected'));
+  const h = document.getElementById('eva-valor'); if(h) h.value='0';
+  // Limpar regiões
+  ['joelho','quadril','tornozelo','lombar','toracica','cervical','ombro','cotovelo','muscular','rtp']
+    .forEach(r => { const el=document.getElementById('reg-'+r); if(el) el.checked=false; });
+  applyRegioes();
+};
