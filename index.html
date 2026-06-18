@@ -1394,13 +1394,111 @@
           <div class="card">
             <div class="card-title"><i class="ti ti-trophy"></i> Critérios de retorno esportivo (RTP)</div>
 
-            <!-- ACL-RSI -->
-            <p class="test-label">ACL-RSI — Prontidão psicológica (0–100)</p>
-            <table class="t">
-              <tr><th>Score ACL-RSI (média das 12 questões × 10)</th></tr>
-              <tr><td><input type="number" id="aclrsi" min="0" max="100" step="0.1" placeholder="0–100" oninput="classifyRSI()"></td></tr>
-              <tr class="avg-row"><td id="aclrsi-class">—</td></tr>
-            </table>
+            <!-- ACL-RSI COMPLETO -->
+            <div class="card-title" style="margin-bottom:8px"><i class="ti ti-brain"></i> ACL-RSI — Prontidão psicológica para retorno ao esporte</div>
+            <p style="font-size:12px;color:#888;margin-bottom:10px">12 questões · escala 0–100 cada · média calculada automaticamente.</p>
+            <div class="escala-resultado" id="aclrsi-resultado">Score: —</div>
+            <div style="font-size:13px;margin-bottom:12px;margin-top:4px" id="aclrsi-class"></div>
+
+            <div class="q-list">
+              <div class="q-item q-item-block"><div class="q-text-block"><span class="q-num">1</span> Você sente <b>medo</b> de sofrer uma nova lesão no joelho ao praticar seu esporte?</div>
+                <div style="display:flex;align-items:center;gap:8px;padding:6px 0 0 32px">
+                  <span style="font-size:11px;color:#888;min-width:20px">0</span>
+                  <input type="range" class="aclrsi-q" id="aclrsi-q1" min="0" max="100" step="1" value="50" style="flex:1" oninput="calcACLRSI()">
+                  <span style="font-size:11px;color:#888;min-width:25px">100</span>
+                  <span class="aclrsi-qv" id="aclrsi-q1v" style="font-weight:600;min-width:28px;text-align:right">50</span>
+                </div>
+              </div>
+              <div class="q-item q-item-block"><div class="q-text-block"><span class="q-num">2</span> Você sente <b>frustração</b> em relação ao seu joelho quando pensa em voltar ao esporte?</div>
+                <div style="display:flex;align-items:center;gap:8px;padding:6px 0 0 32px">
+                  <span style="font-size:11px;color:#888;min-width:20px">0</span>
+                  <input type="range" class="aclrsi-q" id="aclrsi-q2" min="0" max="100" step="1" value="50" style="flex:1" oninput="calcACLRSI()">
+                  <span style="font-size:11px;color:#888;min-width:25px">100</span>
+                  <span class="aclrsi-qv" id="aclrsi-q2v" style="font-weight:600;min-width:28px;text-align:right">50</span>
+                </div>
+              </div>
+              <div class="q-item q-item-block"><div class="q-text-block"><span class="q-num">3</span> Você se sente <b>relaxado</b> ao pensar em praticar seu esporte?</div>
+                <div style="display:flex;align-items:center;gap:8px;padding:6px 0 0 32px">
+                  <span style="font-size:11px;color:#888;min-width:20px">0</span>
+                  <input type="range" class="aclrsi-q" id="aclrsi-q3" min="0" max="100" step="1" value="50" style="flex:1" oninput="calcACLRSI()">
+                  <span style="font-size:11px;color:#888;min-width:25px">100</span>
+                  <span class="aclrsi-qv" id="aclrsi-q3v" style="font-weight:600;min-width:28px;text-align:right">50</span>
+                </div>
+              </div>
+              <div class="q-item q-item-block"><div class="q-text-block"><span class="q-num">4</span> Você <b>confia</b> que seu joelho suportará as demandas do seu esporte?</div>
+                <div style="display:flex;align-items:center;gap:8px;padding:6px 0 0 32px">
+                  <span style="font-size:11px;color:#888;min-width:20px">0</span>
+                  <input type="range" class="aclrsi-q" id="aclrsi-q4" min="0" max="100" step="1" value="50" style="flex:1" oninput="calcACLRSI()">
+                  <span style="font-size:11px;color:#888;min-width:25px">100</span>
+                  <span class="aclrsi-qv" id="aclrsi-q4v" style="font-weight:600;min-width:28px;text-align:right">50</span>
+                </div>
+              </div>
+              <div class="q-item q-item-block"><div class="q-text-block"><span class="q-num">5</span> Você está <b>confiante</b> de que pode desempenhar seu esporte sem se preocupar com o joelho?</div>
+                <div style="display:flex;align-items:center;gap:8px;padding:6px 0 0 32px">
+                  <span style="font-size:11px;color:#888;min-width:20px">0</span>
+                  <input type="range" class="aclrsi-q" id="aclrsi-q5" min="0" max="100" step="1" value="50" style="flex:1" oninput="calcACLRSI()">
+                  <span style="font-size:11px;color:#888;min-width:25px">100</span>
+                  <span class="aclrsi-qv" id="aclrsi-q5v" style="font-weight:600;min-width:28px;text-align:right">50</span>
+                </div>
+              </div>
+              <div class="q-item q-item-block"><div class="q-text-block"><span class="q-num">6</span> Você está <b>preocupado</b> em sofrer uma nova lesão ao praticar seu esporte?</div>
+                <div style="display:flex;align-items:center;gap:8px;padding:6px 0 0 32px">
+                  <span style="font-size:11px;color:#888;min-width:20px">0</span>
+                  <input type="range" class="aclrsi-q" id="aclrsi-q6" min="0" max="100" step="1" value="50" style="flex:1" oninput="calcACLRSI()">
+                  <span style="font-size:11px;color:#888;min-width:25px">100</span>
+                  <span class="aclrsi-qv" id="aclrsi-q6v" style="font-weight:600;min-width:28px;text-align:right">50</span>
+                </div>
+              </div>
+              <div class="q-item q-item-block"><div class="q-text-block"><span class="q-num">7</span> Você acredita que seu joelho está <b>preparado</b> para participar do seu esporte?</div>
+                <div style="display:flex;align-items:center;gap:8px;padding:6px 0 0 32px">
+                  <span style="font-size:11px;color:#888;min-width:20px">0</span>
+                  <input type="range" class="aclrsi-q" id="aclrsi-q7" min="0" max="100" step="1" value="50" style="flex:1" oninput="calcACLRSI()">
+                  <span style="font-size:11px;color:#888;min-width:25px">100</span>
+                  <span class="aclrsi-qv" id="aclrsi-q7v" style="font-weight:600;min-width:28px;text-align:right">50</span>
+                </div>
+              </div>
+              <div class="q-item q-item-block"><div class="q-text-block"><span class="q-num">8</span> Você acredita que poderá atingir seu <b>nível anterior</b> de desempenho esportivo?</div>
+                <div style="display:flex;align-items:center;gap:8px;padding:6px 0 0 32px">
+                  <span style="font-size:11px;color:#888;min-width:20px">0</span>
+                  <input type="range" class="aclrsi-q" id="aclrsi-q8" min="0" max="100" step="1" value="50" style="flex:1" oninput="calcACLRSI()">
+                  <span style="font-size:11px;color:#888;min-width:25px">100</span>
+                  <span class="aclrsi-qv" id="aclrsi-q8v" style="font-weight:600;min-width:28px;text-align:right">50</span>
+                </div>
+              </div>
+              <div class="q-item q-item-block"><div class="q-text-block"><span class="q-num">9</span> Você está confiante de que seu joelho <b>não falhará</b> durante a prática esportiva?</div>
+                <div style="display:flex;align-items:center;gap:8px;padding:6px 0 0 32px">
+                  <span style="font-size:11px;color:#888;min-width:20px">0</span>
+                  <input type="range" class="aclrsi-q" id="aclrsi-q9" min="0" max="100" step="1" value="50" style="flex:1" oninput="calcACLRSI()">
+                  <span style="font-size:11px;color:#888;min-width:25px">100</span>
+                  <span class="aclrsi-qv" id="aclrsi-q9v" style="font-weight:600;min-width:28px;text-align:right">50</span>
+                </div>
+              </div>
+              <div class="q-item q-item-block"><div class="q-text-block"><span class="q-num">10</span> Você sente <b>receio</b> de realizar movimentos que poderiam causar uma nova lesão?</div>
+                <div style="display:flex;align-items:center;gap:8px;padding:6px 0 0 32px">
+                  <span style="font-size:11px;color:#888;min-width:20px">0</span>
+                  <input type="range" class="aclrsi-q" id="aclrsi-q10" min="0" max="100" step="1" value="50" style="flex:1" oninput="calcACLRSI()">
+                  <span style="font-size:11px;color:#888;min-width:25px">100</span>
+                  <span class="aclrsi-qv" id="aclrsi-q10v" style="font-weight:600;min-width:28px;text-align:right">50</span>
+                </div>
+              </div>
+              <div class="q-item q-item-block"><div class="q-text-block"><span class="q-num">11</span> Você está confiante para <b>competir</b> ou participar de atividades esportivas intensas?</div>
+                <div style="display:flex;align-items:center;gap:8px;padding:6px 0 0 32px">
+                  <span style="font-size:11px;color:#888;min-width:20px">0</span>
+                  <input type="range" class="aclrsi-q" id="aclrsi-q11" min="0" max="100" step="1" value="50" style="flex:1" oninput="calcACLRSI()">
+                  <span style="font-size:11px;color:#888;min-width:25px">100</span>
+                  <span class="aclrsi-qv" id="aclrsi-q11v" style="font-weight:600;min-width:28px;text-align:right">50</span>
+                </div>
+              </div>
+              <div class="q-item q-item-block"><div class="q-text-block"><span class="q-num">12</span> Você acredita que pode retornar ao esporte com <b>segurança</b>?</div>
+                <div style="display:flex;align-items:center;gap:8px;padding:6px 0 0 32px">
+                  <span style="font-size:11px;color:#888;min-width:20px">0</span>
+                  <input type="range" class="aclrsi-q" id="aclrsi-q12" min="0" max="100" step="1" value="50" style="flex:1" oninput="calcACLRSI()">
+                  <span style="font-size:11px;color:#888;min-width:25px">100</span>
+                  <span class="aclrsi-qv" id="aclrsi-q12v" style="font-weight:600;min-width:28px;text-align:right">50</span>
+                </div>
+              </div>
+            </div>
+            <input type="hidden" id="aclrsi">
 
             <hr class="divider">
 
