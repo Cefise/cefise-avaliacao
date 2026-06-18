@@ -161,6 +161,24 @@
               <input type="text" id="f-esporte" placeholder="Ex: Futebol, Corrida, Musculação...">
             </div>
           </div>
+
+          <!-- Seletor de regiões -->
+          <div class="card">
+            <div class="card-title"><i class="ti ti-body-scan"></i> Regiões a avaliar</div>
+            <p style="font-size:12px;color:#888;margin-bottom:12px">Selecione as regiões. As abas de testes, escalas e questionários serão filtradas automaticamente.</p>
+            <div class="regioes-grid">
+              <label class="regiao-card" data-regiao="joelho"><input type="checkbox" id="reg-joelho" onchange="applyRegioes()"><i class="ti ti-run"></i><span>Joelho</span></label>
+              <label class="regiao-card" data-regiao="quadril"><input type="checkbox" id="reg-quadril" onchange="applyRegioes()"><i class="ti ti-body-scan"></i><span>Quadril</span></label>
+              <label class="regiao-card" data-regiao="tornozelo"><input type="checkbox" id="reg-tornozelo" onchange="applyRegioes()"><i class="ti ti-walk"></i><span>Tornozelo</span></label>
+              <label class="regiao-card" data-regiao="lombar"><input type="checkbox" id="reg-lombar" onchange="applyRegioes()"><i class="ti ti-spine"></i><span>Lombar</span></label>
+              <label class="regiao-card" data-regiao="toracica"><input type="checkbox" id="reg-toracica" onchange="applyRegioes()"><i class="ti ti-spine"></i><span>Torácica</span></label>
+              <label class="regiao-card" data-regiao="cervical"><input type="checkbox" id="reg-cervical" onchange="applyRegioes()"><i class="ti ti-spine"></i><span>Cervical</span></label>
+              <label class="regiao-card" data-regiao="ombro"><input type="checkbox" id="reg-ombro" onchange="applyRegioes()"><i class="ti ti-arm"></i><span>Ombro</span></label>
+              <label class="regiao-card" data-regiao="cotovelo"><input type="checkbox" id="reg-cotovelo" onchange="applyRegioes()"><i class="ti ti-arm"></i><span>Cotovelo</span></label>
+              <label class="regiao-card" data-regiao="muscular"><input type="checkbox" id="reg-muscular" onchange="applyRegioes()"><i class="ti ti-barbell"></i><span>Lesão muscular</span></label>
+              <label class="regiao-card" data-regiao="rtp"><input type="checkbox" id="reg-rtp" onchange="applyRegioes()"><i class="ti ti-trophy"></i><span>RTP</span></label>
+            </div>
+          </div>
           <div class="tab-nav-btns"><button class="btn btn-primary" onclick="showTab(1)">Próximo <i class="ti ti-arrow-right"></i></button></div>
         </div>
 
@@ -204,16 +222,26 @@
               <input type="text" id="det-dor" placeholder="Qual?" class="detail-input" style="display:none">
             </div>
             <hr class="divider">
-            <!-- EVA -->
+            <!-- EVA colorida -->
             <div class="anamnese-item">
-              <label class="anamnese-label">EVA — Escala Visual Analógica de dor (0 = sem dor, 10 = pior dor)</label>
-              <div style="display:flex;align-items:center;gap:16px;margin-top:8px">
-                <input type="range" id="eva-valor" min="0" max="10" value="0" step="1" style="flex:1" oninput="document.getElementById('eva-display').textContent=this.value">
-                <span id="eva-display" style="font-size:22px;font-weight:600;min-width:32px;text-align:center">0</span>
+              <label class="anamnese-label">EVA — Escala Visual Analógica de dor</label>
+              <div class="eva-scale" id="eva-scale">
+                <button type="button" class="eva-btn" data-val="0" onclick="selectEVA(0)">0</button>
+                <button type="button" class="eva-btn" data-val="1" onclick="selectEVA(1)">1</button>
+                <button type="button" class="eva-btn" data-val="2" onclick="selectEVA(2)">2</button>
+                <button type="button" class="eva-btn" data-val="3" onclick="selectEVA(3)">3</button>
+                <button type="button" class="eva-btn" data-val="4" onclick="selectEVA(4)">4</button>
+                <button type="button" class="eva-btn" data-val="5" onclick="selectEVA(5)">5</button>
+                <button type="button" class="eva-btn" data-val="6" onclick="selectEVA(6)">6</button>
+                <button type="button" class="eva-btn" data-val="7" onclick="selectEVA(7)">7</button>
+                <button type="button" class="eva-btn" data-val="8" onclick="selectEVA(8)">8</button>
+                <button type="button" class="eva-btn" data-val="9" onclick="selectEVA(9)">9</button>
+                <button type="button" class="eva-btn" data-val="10" onclick="selectEVA(10)">10</button>
               </div>
-              <div style="display:flex;justify-content:space-between;font-size:11px;color:#888;margin-top:2px">
+              <div style="display:flex;justify-content:space-between;font-size:11px;color:#888;margin-top:4px">
                 <span>Sem dor</span><span>Pior dor imaginável</span>
               </div>
+              <input type="hidden" id="eva-valor" value="0">
             </div>
           </div>
           <div class="tab-nav-btns">
@@ -561,7 +589,7 @@
           <!-- ══════════════════════════════════════════════════════ -->
           <!-- KOOS COMPLETO — 42 itens em 5 subescalas -->
           <!-- ══════════════════════════════════════════════════════ -->
-          <div class="card" style="margin-bottom:14px">
+          <div class="card regiao-block" data-regioes="joelho" style="margin-bottom:14px">
             <div class="card-title"><i class="ti ti-activity"></i> KOOS — Knee Injury &amp; Osteoarthritis Outcome Score</div>
             <p style="font-size:12px;color:#888;margin-bottom:10px">42 itens · 5 subescalas · score 0–100 por subescala (100 = sem problemas). Calculado automaticamente.</p>
             <div style="display:flex;flex-wrap:wrap;gap:10px;margin-bottom:12px">
@@ -676,7 +704,7 @@
           <!-- ══════════════════════════════════════════════════════ -->
           <!-- IKDC COMPLETO — 10 questões -->
           <!-- ══════════════════════════════════════════════════════ -->
-          <div class="card" style="margin-bottom:14px">
+          <div class="card regiao-block" data-regioes="joelho" style="margin-bottom:14px">
             <div class="card-title"><i class="ti ti-activity"></i> IKDC — International Knee Documentation Committee</div>
             <p style="font-size:12px;color:#888;margin-bottom:10px">10 questões · score = (soma / máximo possível) × 100. Calculado automaticamente.</p>
             <div class="escala-resultado" id="ikdc-resultado">Score: —</div>
@@ -833,7 +861,7 @@
           </div>
 
           <!-- ── HOOS (score manual) ── -->
-          <div class="card" style="margin-bottom:14px">
+          <div class="card regiao-block" data-regioes="quadril" style="margin-bottom:14px">
             <div class="card-title"><i class="ti ti-activity"></i> HOOS — Hip disability &amp; Osteoarthritis Outcome Score</div>
             <p style="font-size:12px;color:#888;margin-bottom:8px">Insira os scores de cada subescala (0–100).</p>
             <table class="t">
@@ -849,7 +877,7 @@
           <!-- ══════════════════════════════════════════════════════ -->
           <!-- FAAM COMPLETO -->
           <!-- ══════════════════════════════════════════════════════ -->
-          <div class="card" style="margin-bottom:14px">
+          <div class="card regiao-block" data-regioes="tornozelo" style="margin-bottom:14px">
             <div class="card-title"><i class="ti ti-walk"></i> FAAM — Foot and Ankle Ability Measure</div>
             <p style="font-size:12px;color:#888;margin-bottom:10px">AVD (21 itens) + Esporte (8 itens). Score 0–100 calculado automaticamente. N/A = não aplicável (não conta).</p>
             <div style="display:flex;flex-wrap:wrap;gap:10px;margin-bottom:12px">
@@ -903,7 +931,7 @@
           <!-- ══════════════════════════════════════════════════════ -->
           <!-- DASH COMPLETO — 30 questões -->
           <!-- ══════════════════════════════════════════════════════ -->
-          <div class="card" style="margin-bottom:14px">
+          <div class="card regiao-block" data-regioes="ombro,cotovelo" style="margin-bottom:14px">
             <div class="card-title"><i class="ti ti-arm"></i> DASH — Disabilities of the Arm, Shoulder and Hand</div>
             <p style="font-size:12px;color:#888;margin-bottom:10px">30 questões · escala 1–5 · mínimo 27 respostas. Score calculado automaticamente.</p>
             <div class="escala-resultado" id="dash-resultado">Score: —</div>
@@ -962,7 +990,7 @@
           <!-- ══════════════════════════════════════════════════════ -->
           <!-- ODI COMPLETO — 10 seções -->
           <!-- ══════════════════════════════════════════════════════ -->
-          <div class="card" style="margin-bottom:14px">
+          <div class="card regiao-block" data-regioes="lombar" style="margin-bottom:14px">
             <div class="card-title"><i class="ti ti-spine"></i> ODI — Oswestry Disability Index (lombalgia)</div>
             <p style="font-size:12px;color:#888;margin-bottom:10px">10 seções · 0–5 pts cada · score em %. Calculado automaticamente.</p>
             <div class="escala-resultado" id="odi-resultado">Score: —</div>
@@ -1086,7 +1114,7 @@
           <!-- ══════════════════════════════════════════════════════ -->
           <!-- NDI — Neck Disability Index -->
           <!-- ══════════════════════════════════════════════════════ -->
-          <div class="card" style="margin-bottom:14px">
+          <div class="card regiao-block" data-regioes="cervical" style="margin-bottom:14px">
             <div class="card-title"><i class="ti ti-spine"></i> NDI — Neck Disability Index (cervicalgia)</div>
             <p style="font-size:12px;color:#888;margin-bottom:10px">10 seções · 0–5 pts cada · score em %. Calculado automaticamente.</p>
             <div class="escala-resultado" id="ndi-resultado">Score: —</div>
@@ -1200,7 +1228,7 @@
           <!-- ══════════════════════════════════════════════════════ -->
           <!-- VISA-P -->
           <!-- ══════════════════════════════════════════════════════ -->
-          <div class="card" style="margin-bottom:14px">
+          <div class="card regiao-block" data-regioes="joelho" style="margin-bottom:14px">
             <div class="card-title"><i class="ti ti-run"></i> VISA-P — Tendinopatia patelar</div>
             <p style="font-size:12px;color:#888;margin-bottom:10px">8 questões · score máximo 100. Calculado automaticamente.</p>
             <div class="escala-resultado" id="visap-resultado">Score: —</div>
@@ -1279,7 +1307,7 @@
           <!-- ══════════════════════════════════════════════════════ -->
           <!-- VISA-A -->
           <!-- ══════════════════════════════════════════════════════ -->
-          <div class="card" style="margin-bottom:14px">
+          <div class="card regiao-block" data-regioes="tornozelo" style="margin-bottom:14px">
             <div class="card-title"><i class="ti ti-run"></i> VISA-A — Tendinopatia aquiliana</div>
             <p style="font-size:12px;color:#888;margin-bottom:10px">8 questões · score máximo 100. Calculado automaticamente.</p>
             <div class="escala-resultado" id="visaa-resultado">Score: —</div>
