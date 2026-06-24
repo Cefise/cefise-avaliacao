@@ -1444,3 +1444,131 @@ document.addEventListener('DOMContentLoaded', () => {
     if (el && vEl) vEl.textContent = el.value;
   }
 });
+
+// ─── ACCORDION ────────────────────────────────────────────────
+function toggleAcc(btn) {
+  const body = btn.nextElementSibling;
+  const isOpen = btn.classList.contains('open');
+  // Fechar todos no mesmo acc-list
+  const list = btn.closest('.acc-list');
+  if (list) {
+    list.querySelectorAll('.acc-header.open').forEach(h => {
+      h.classList.remove('open');
+      h.nextElementSibling.style.display = 'none';
+    });
+  }
+  if (!isOpen) {
+    btn.classList.add('open');
+    body.style.display = 'block';
+  }
+}
+
+// ─── CRONÔMETRO ───────────────────────────────────────────────
+const _cronos = {};
+
+function cronoToggle(id) {
+  if (!_cronos[id]) _cronos[id] = { running: false, elapsed: 0, start: null, interval: null };
+  const c = _cronos[id];
+  const displayId = id.startsWith('core') ? 'crono-core-display' : id.startsWith('dj') ? 'crono-dj-display' : 'crono-sls-display';
+  if (c.running) {
+    clearInterval(c.interval);
+    c.elapsed += Date.now() - c.start;
+    c.running = false;
+  } else {
+    c.start = Date.now();
+    c.running = true;
+    c.interval = setInterval(() => {
+      const total = c.elapsed + (Date.now() - c.start);
+      const secs = Math.floor(total / 1000);
+      const ms = Math.floor((total % 1000) / 10);
+      const disp = document.getElementById(displayId);
+      if (disp) disp.textContent = `${String(Math.floor(secs/60)).padStart(2,'0')}:${String(secs%60).padStart(2,'0')}`;
+    }, 50);
+  }
+}
+
+function cronoSet(fieldId) {
+  // Determinar qual crono está ativo
+  const prefix = fieldId.startsWith('core') ? fieldId : fieldId.startsWith('sls') ? fieldId : 'dj-t';
+  const c = _cronos[prefix] || _cronos[fieldId];
+  if (!c) return;
+  if (c.running) { clearInterval(c.interval); c.elapsed += Date.now() - c.start; c.running = false; }
+  const secs = Math.floor(c.elapsed / 1000);
+  const el = document.getElementById(fieldId);
+  if (el) el.value = secs;
+  toast(`Salvo: ${secs}s`);
+}
+
+function cronoReset(prefix) {
+  ['d','e','t'].forEach(s => {
+    const id = prefix + '-' + s;
+    if (_cronos[id]) { clearInterval(_cronos[id].interval); _cronos[id] = null; }
+  });
+  const displayId = prefix === 'core' ? 'crono-core-display' : prefix === 'dj' ? 'crono-dj-display' : 'crono-sls-display';
+  const disp = document.getElementById(displayId);
+  if (disp) disp.textContent = '00:00';
+}
+
+// ─── RTP MULTI-REGIÃO ─────────────────────────────────────────
+function updateRTPRegioes() {
+  const regioes = ['joelho','ombro','lombar','quadril','tornozelo','muscular'];
+  regioes.forEach(r => {
+    const block = document.getElementById('rtp-' + r);
+    if (!block) return;
+    const checked = document.getElementById('reg-' + r)?.checked ||
+                    document.getElementById('reg-' + (r==='lombar'?'toracica':r))?.checked;
+    block.style.display = (document.getElementById('reg-' + r)?.checked) ? 'block' : 'none';
+  });
+  // lombar também para torácica
+  const lomBlock = document.getElementById('rtp-lombar');
+  if (lomBlock) {
+    if (document.getElementById('reg-lombar')?.checked || document.getElementById('reg-toracica')?.checked) {
+      lomBlock.style.display = 'block';
+    }
+  }
+  updateRTPCounter();
+}
+
+// Override updateRTPCounter para contar todos os checkboxes visíveis
+function updateRTPCounter() {
+  const allIds = [
+    'rtp-dor','rtp-edema','rtp-psico','rtp-treino','rtp-agilidade',
+    'rtp-lsi','rtp-forca','rtp-tempo','rtp-joelho-adm',
+    'rtp-ombro-adm','rtp-ombro-forca','rtp-ombro-estab',
+    'rtp-coluna-adm','rtp-coluna-core','rtp-coluna-odi',
+    'rtp-quadril-adm','rtp-quadril-forca','rtp-quadril-hoos',
+    'rtp-tornozelo-estab','rtp-tornozelo-dors','rtp-tornozelo-faam',
+    'rtp-musc-dor','rtp-musc-forca','rtp-musc-agilidade'
+  ];
+  let total = 0, checked = 0;
+  allIds.forEach(id => {
+    const el = document.getElementById(id);
+    if (!el) return;
+    const parent = el.closest('.rtp-regiao');
+    if (parent && parent.style.display === 'none') return;
+    total++;
+    if (el.checked) checked++;
+  });
+  const el = document.getElementById('rtp-progresso');
+  if (el) {
+    el.textContent = `${checked} / ${total}`;
+    el.style.color = checked === total ? '#1D9E75' : checked >= total*0.75 ? '#BA7517' : '#E24B4A';
+  }
+}
+
+// Atualizar applyRegioes para também atualizar RTP
+const _origApplyRegioes = typeof applyRegioes === 'function' ? applyRegioes : null;
+applyRegioes = function() {
+  if (_origApplyRegioes) _origApplyRegioes();
+  updateRTPRegioes();
+};
+
+// Inicializar acc-items com classe acc-open
+document.addEventListener('DOMContentLoaded', () => {
+  document.querySelectorAll('.acc-item.acc-open').forEach(item => {
+    const header = item.querySelector('.acc-header');
+    const body = item.querySelector('.acc-body');
+    if (header) header.classList.add('open');
+    if (body) body.style.display = 'block';
+  });
+});
