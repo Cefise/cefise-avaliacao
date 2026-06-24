@@ -267,3 +267,24 @@ table.t td input:focus, table.t td select:focus { outline: 1px solid var(--green
 .interp-ok  { background: #E1F5EE; color: #0F6E56; border-left: 3px solid #1D9E75; }
 .interp-warn{ background: #FEF3C7; color: #92400E; border-left: 3px solid #F59E0B; }
 .interp-bad { background: #FEE2E2; color: #991B1B; border-left: 3px solid #EF4444; }
+
+/* ── Accordion ── */
+.acc-list { display: flex; flex-direction: column; gap: 0; border: 1px solid var(--border); border-radius: var(--radius); overflow: hidden; margin-bottom: 16px; }
+.acc-section-title { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: .06em; color: var(--text3); background: var(--bg); padding: 8px 16px; border-bottom: 1px solid var(--border); }
+.acc-item { border-bottom: 1px solid var(--border); }
+.acc-item:last-child { border-bottom: none; }
+.acc-header { width: 100%; display: flex; align-items: center; justify-content: space-between; padding: 13px 16px; background: var(--bg2); border: none; cursor: pointer; font-size: 14px; font-weight: 500; color: var(--text); text-align: left; transition: background .12s; gap: 10px; }
+.acc-header:hover { background: var(--bg); }
+.acc-header.open { background: var(--green-light); color: var(--green); }
+.acc-arrow { font-size: 16px; flex-shrink: 0; transition: transform .2s; color: var(--text3); }
+.acc-header.open .acc-arrow { transform: rotate(180deg); color: var(--green); }
+.acc-body { display: none; padding: 14px 16px; border-top: 1px solid var(--border); background: var(--bg2); }
+.acc-body.open, .acc-item.acc-open .acc-body { display: block; }
+
+/* ── Cronômetro ── */
+.cronometro-box { display: flex; flex-direction: column; align-items: center; gap: 10px; padding: 14px; background: #f9fafb; border: 1px solid var(--border); border-radius: 8px; margin-bottom: 4px; }
+.crono-display { font-size: 36px; font-weight: 700; font-variant-numeric: tabular-nums; color: var(--green); letter-spacing: 2px; }
+.crono-btns { display: flex; gap: 8px; flex-wrap: wrap; justify-content: center; }
+
+/* ── RTP regiões ── */
+.rtp-regiao { margin-top: 4px; }
