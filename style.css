@@ -288,3 +288,82 @@ table.t td input:focus, table.t td select:focus { outline: 1px solid var(--green
 
 /* ── RTP regiões ── */
 .rtp-regiao { margin-top: 4px; }
+
+/* ── Welcome Screen ── */
+.welcome-screen {
+  position: relative; min-height: 100vh; width: 100%;
+  background: linear-gradient(135deg, #0A3D1F 0%, #1D9E75 60%, #0A3D1F 100%);
+  display: flex; align-items: center; justify-content: center;
+  overflow: hidden;
+}
+.welcome-content {
+  position: relative; z-index: 2; text-align: center; padding: 40px 32px;
+  max-width: 520px;
+}
+.welcome-logo {
+  height: 100px; object-fit: contain; margin-bottom: 24px;
+  filter: drop-shadow(0 4px 16px rgba(0,0,0,.3));
+}
+.welcome-title {
+  font-size: 36px; font-weight: 800; color: #fff; letter-spacing: -.5px;
+  margin-bottom: 8px;
+}
+.welcome-sub {
+  font-size: 16px; color: rgba(255,255,255,.85); margin-bottom: 6px; font-weight: 400;
+}
+.welcome-slogan {
+  font-size: 13px; color: rgba(255,255,255,.6); font-style: italic; margin-bottom: 40px;
+}
+.btn-welcome {
+  display: inline-flex; align-items: center; gap: 10px;
+  background: #fff; color: #0A3D1F;
+  border: none; border-radius: 50px; padding: 16px 40px;
+  font-size: 16px; font-weight: 700; cursor: pointer;
+  box-shadow: 0 8px 24px rgba(0,0,0,.2);
+  transition: transform .15s, box-shadow .15s;
+}
+.btn-welcome:hover { transform: translateY(-2px); box-shadow: 0 12px 32px rgba(0,0,0,.25); }
+.btn-welcome i { font-size: 20px; }
+.welcome-footer {
+  display: flex; gap: 16px; justify-content: center;
+  margin-top: 40px; font-size: 12px; color: rgba(255,255,255,.5);
+}
+/* Shapes decorativos */
+.welcome-bg-shapes { position: absolute; inset: 0; z-index: 1; pointer-events: none; }
+.shape {
+  position: absolute; border-radius: 50%;
+  background: rgba(255,255,255,.04);
+}
+.shape-1 { width: 500px; height: 500px; top: -150px; right: -100px; }
+.shape-2 { width: 300px; height: 300px; bottom: -80px; left: -60px; }
+.shape-3 { width: 200px; height: 200px; top: 40%; left: 10%; background: rgba(255,255,255,.03); }
+
+/* ── Gráficos coloridos no relatório ── */
+.lsi-bar-wrap { display: flex; align-items: center; gap: 10px; margin: 4px 0; }
+.lsi-bar-label { min-width: 90px; font-size: 13px; color: var(--text2); }
+.lsi-bar-track { flex: 1; height: 10px; background: #eee; border-radius: 99px; overflow: hidden; }
+.lsi-bar-fill { height: 100%; border-radius: 99px; transition: width .4s; }
+.lsi-bar-pct { min-width: 48px; font-size: 12px; font-weight: 600; text-align: right; }
+.lsi-ok { background: #22c55e; }
+.lsi-warn { background: #f59e0b; }
+.lsi-bad { background: #ef4444; }
+.lsi-ok-txt { color: #16a34a; }
+.lsi-warn-txt { color: #d97706; }
+.lsi-bad-txt { color: #dc2626; }
+
+/* ── Resumo rápido no relatório ── */
+.rel-quick-grid {
+  display: grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 10px; margin-bottom: 16px;
+}
+.rel-quick-card {
+  background: var(--bg2); border: 1px solid var(--border); border-radius: 8px;
+  padding: 12px 14px; border-left: 4px solid #ccc;
+}
+.rel-quick-card.ok   { border-left-color: #22c55e; }
+.rel-quick-card.warn { border-left-color: #f59e0b; }
+.rel-quick-card.bad  { border-left-color: #ef4444; }
+.rel-quick-label { font-size: 11px; color: var(--text3); margin-bottom: 4px; }
+.rel-quick-val   { font-size: 18px; font-weight: 700; }
+.rel-quick-card.ok   .rel-quick-val { color: #16a34a; }
+.rel-quick-card.warn .rel-quick-val { color: #d97706; }
+.rel-quick-card.bad  .rel-quick-val { color: #dc2626; }
