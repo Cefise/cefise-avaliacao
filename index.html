@@ -15,8 +15,32 @@
 </head>
 <body>
 
+<!-- WELCOME SCREEN -->
+<div id="screen-welcome" style="display:flex">
+  <div class="welcome-screen">
+    <div class="welcome-content">
+      <img src="public/logo.png" alt="Cefise Academy" class="welcome-logo">
+      <h1 class="welcome-title">Cefise Academy</h1>
+      <p class="welcome-sub">Sistema de Avaliação Clínica em Fisioterapia Esportiva</p>
+      <p class="welcome-slogan">Avaliações precisas. Decisões seguras. Resultados reais.</p>
+      <button class="btn-welcome" onclick="goToLogin()">
+        <i class="ti ti-clipboard-list"></i> Iniciar Avaliação
+      </button>
+      <div class="welcome-footer">
+        <span>Centro Especializado em Fisioterapia Esportiva</span>
+        <span>Chapecó · SC</span>
+      </div>
+    </div>
+    <div class="welcome-bg-shapes">
+      <div class="shape shape-1"></div>
+      <div class="shape shape-2"></div>
+      <div class="shape shape-3"></div>
+    </div>
+  </div>
+</div>
+
 <!-- LOGIN -->
-<div id="screen-login" class="login-screen" style="display:none">
+<div id="screen-login" class="login-screen" style="display:none" id="screen-login">
   <div class="login-box">
     <img src="public/logo.png" alt="Cefise Academy" class="login-logo">
     <h1 class="login-title">Sistema de Avaliação</h1>
@@ -97,6 +121,7 @@
           <div class="card">
             <div class="card-title"><i class="ti ti-users"></i> Últimos pacientes</div>
             <div id="dash-recent"></div>
+          <div style="margin-top:12px"><button class="btn btn-primary btn-sm" onclick="showPage('avaliacao')"><i class="ti ti-plus"></i> Nova avaliação</button></div>
           </div>
           <div class="card">
             <div class="card-title"><i class="ti ti-chart-pie"></i> Avaliações por profissional</div>
@@ -1329,8 +1354,9 @@
             <select id="rel-paciente" onchange="loadRelatorio(this.value)" style="flex:1">
               <option value="">Selecione um paciente...</option>
             </select>
-            <button class="btn btn-primary btn-sm" onclick="gerarPDF()">
-              <i class="ti ti-file-type-pdf"></i> Exportar PDF
+            <button class="btn btn-outline btn-sm" onclick="gerarPDF('resumo')"><i class="ti ti-file-text"></i> Resumo clínico</button>
+            <button class="btn btn-primary btn-sm" onclick="gerarPDF('completo')">
+              <i class="ti ti-file-type-pdf"></i> Relatório completo
             </button>
           </div>
         </div>
