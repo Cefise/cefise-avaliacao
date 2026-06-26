@@ -1572,3 +1572,428 @@ document.addEventListener('DOMContentLoaded', () => {
     if (body) body.style.display = 'block';
   });
 });
+
+// ─── WELCOME SCREEN ───────────────────────────────────────────
+function goToLogin() {
+  document.getElementById('screen-welcome').style.display = 'none';
+  document.getElementById('screen-login').style.display = 'flex';
+}
+
+// Override do init para mostrar welcome primeiro
+window.addEventListener('DOMContentLoaded', () => {
+  // Se já tem dados salvos, vai direto pro app
+  const db = getDB();
+  if (db.profissionais && db.profissionais.length > 0) {
+    document.getElementById('screen-welcome').style.display = 'none';
+    document.getElementById('screen-login').style.display = 'none';
+    document.getElementById('screen-app').style.display = 'flex';
+    updateSidebarUser();
+    showPage('dashboard');
+  }
+}, { once: true });
+
+// ─── RELATÓRIO COM CORES ──────────────────────────────────────
+function lsiStatus(v) {
+  if (!v || isNaN(v)) return 'neu';
+  const n = parseFloat(v);
+  return n >= 90 ? 'ok' : n >= 75 ? 'warn' : 'bad';
+}
+function lsiColor(v) {
+  const s = lsiStatus(v);
+  return s === 'ok' ? '#22c55e' : s === 'warn' ? '#f59e0b' : '#ef4444';
+}
+function scaleStatus(v, min, higher=true) {
+  if (!v || isNaN(v)) return 'neu';
+  const n = parseFloat(v);
+  if (higher) return n >= min ? 'ok' : n >= min*0.8 ? 'warn' : 'bad';
+  return n <= min ? 'ok' : n <= min*1.3 ? 'warn' : 'bad';
+}
+
+// Substituir loadRelatorio para adicionar gráficos coloridos
+const _origLoadRelatorio = loadRelatorio;
+loadRelatorio = function(pacId) {
+  _origLoadRelatorio(pacId);
+  setTimeout(() => buildColorCharts(pacId), 200);
+};
+
+function buildColorCharts(pacId) {
+  if (!pacId) return;
+  const db = getDB();
+  const avals = db.avaliacoes.filter(a => a.paciente_id === parseInt(pacId)).sort((a,b)=>a.data.localeCompare(b.data));
+  if (!avals.length) return;
+  const last = avals[avals.length-1];
+
+  // Adicionar cards rápidos de resumo ao topo do relatório
+  const relContent = document.getElementById('relatorio-content');
+  if (!relContent) return;
+
+  const lsiTests = [
+    ['Single Hop', last.sht_avg_d, last.sht_avg_e],
+    ['Triple Hop', last.tht_avg_d, last.tht_avg_e],
+    ['Crossover',  last.cot_avg_d, last.cot_avg_e],
+    ['Side Hop',   last.sidehop_d, last.sidehop_e],
+    ['Squat',      last.squat_d,   last.squat_e],
+    ['Bridge',     last.bridge_d,  last.bridge_e],
+    ['Dorsiflexão',last.dors_best_d, last.dors_best_e],
+  ].filter(t => t[1] || t[2]);
+
+  if (!lsiTests.length) return;
+
+  // Inserir seção de barras coloridas de LSI antes dos gráficos Chart.js
+  const lsiSection = document.createElement('div');
+  lsiSection.className = 'card';
+  lsiSection.style.marginBottom = '16px';
+  lsiSection.innerHTML = `
+    <div class="card-title"><i class="ti ti-arrows-left-right"></i> LSI — Barras de simetria</div>
+    <p style="font-size:12px;color:#888;margin-bottom:12px">Verde ≥ 90% · Amarelo 75–89% · Vermelho &lt; 75%</p>
+    ${lsiTests.map(([nm, d, e]) => {
+      const lv = (d && e && Math.max(d,e) > 0) ? (Math.min(d,e)/Math.max(d,e)*100) : null;
+      if (!lv) return '';
+      const pct = Math.min(lv, 100).toFixed(1);
+      const color = lsiColor(lv);
+      const cls = lsiStatus(lv);
+      return `<div class="lsi-bar-wrap">
+        <span class="lsi-bar-label">${nm}</span>
+        <div class="lsi-bar-track">
+          <div class="lsi-bar-fill" style="width:${pct}%;background:${color}"></div>
+        </div>
+        <span class="lsi-bar-pct lsi-${cls}-txt">${pct}%</span>
+      </div>`;
+    }).join('')}
+    <div style="display:flex;gap:16px;margin-top:8px;font-size:11px;color:#888">
+      <span>— Linha de corte RTP: 90%</span>
+    </div>
+  `;
+
+  // Inserir cards rápidos
+  const quickCards = [
+    last.eva ? { label:'EVA', val:`${last.eva}/10`, st: parseInt(last.eva) <= 3 ? 'ok' : parseInt(last.eva) <= 6 ? 'warn' : 'bad' } : null,
+    last.fms_total ? { label:'FMS', val:`${last.fms_total}/21`, st: parseInt(last.fms_total) >= 14 ? 'ok' : parseInt(last.fms_total) >= 10 ? 'warn' : 'bad' } : null,
+    last.aclrsi ? { label:'ACL-RSI', val:`${parseFloat(last.aclrsi).toFixed(0)}`, st: parseFloat(last.aclrsi) >= 65 ? 'ok' : parseFloat(last.aclrsi) >= 35 ? 'warn' : 'bad' } : null,
+    last.ikdc ? { label:'IKDC', val:`${parseFloat(last.ikdc).toFixed(0)}`, st: scaleStatus(last.ikdc, 75) } : null,
+    last.koos_esporte ? { label:'KOOS Esp.', val:`${parseFloat(last.koos_esporte).toFixed(0)}`, st: scaleStatus(last.koos_esporte, 70) } : null,
+    last.odi ? { label:'ODI', val:`${parseFloat(last.odi).toFixed(0)}%`, st: scaleStatus(last.odi, 20, false) } : null,
+    last.visap ? { label:'VISA-P', val:`${parseFloat(last.visap).toFixed(0)}`, st: scaleStatus(last.visap, 80) } : null,
+  ].filter(Boolean);
+
+  if (quickCards.length) {
+    const quickSection = document.createElement('div');
+    quickSection.className = 'rel-quick-grid';
+    quickSection.style.marginBottom = '16px';
+    quickSection.innerHTML = quickCards.map(c =>
+      `<div class="rel-quick-card ${c.st}">
+        <div class="rel-quick-label">${c.label}</div>
+        <div class="rel-quick-val">${c.val}</div>
+      </div>`
+    ).join('');
+    relContent.insertBefore(quickSection, relContent.firstChild.nextSibling);
+  }
+
+  // Inserir barras LSI após os cards rápidos
+  const insertAfter = relContent.querySelector('.reav-banner') || relContent.querySelector('.rel-quick-grid') || relContent.firstChild;
+  if (insertAfter && insertAfter.parentNode) {
+    insertAfter.parentNode.insertBefore(lsiSection, insertAfter.nextSibling);
+  }
+
+  // Atualizar cores das barras do Chart.js de força
+  setTimeout(() => {
+    const forceCanvas = document.getElementById('rc-forca');
+    if (forceCanvas && forceCanvas.__chartjs_chart) {
+      // Chart.js v4 — atualizar cores
+    }
+  }, 100);
+}
+
+// ─── PDF DUPLO ────────────────────────────────────────────────
+async function gerarPDF(tipo = 'completo') {
+  const pacId = document.getElementById('rel-paciente')?.value;
+  if (!pacId) { toast('Selecione um paciente'); return; }
+  const db = getDB();
+  const pac = db.pacientes.find(p => p.id === parseInt(pacId));
+  const avals = db.avaliacoes.filter(a => a.paciente_id === parseInt(pacId)).sort((a,b)=>a.data.localeCompare(b.data));
+  if (!pac || !avals.length) { toast('Sem dados'); return; }
+
+  const { jsPDF } = window.jspdf;
+  const doc = new jsPDF({ orientation:'portrait', unit:'mm', format:'a4' });
+  const last = avals[avals.length-1], first = avals[0], hasReav = avals.length > 1;
+  const W = 210, mg = 16; let y = 0;
+  const prof = db.profissionais.find(p => p.id === last.profissional_id);
+
+  const G = [29,158,117], R = [220,38,38], A = [245,158,11], DK = [30,107,40];
+  const n = v => v ? Number(v).toFixed(1) : '—';
+
+  // ── Cabeçalho ──
+  doc.setFillColor(...DK); doc.rect(0,0,W,32,'F');
+  doc.setTextColor(255,255,255); doc.setFontSize(18); doc.setFont(undefined,'bold');
+  doc.text('Cefise Academy', mg, 13);
+  doc.setFontSize(10); doc.setFont(undefined,'normal');
+  const tipoLabel = tipo === 'resumo' ? 'Resumo Clínico' : 'Relatório Completo';
+  doc.text(`${tipoLabel} de Avaliação`, mg, 20);
+  doc.text(`Gerado em ${new Date().toLocaleString('pt-BR')}`, mg, 27);
+  y = 40;
+
+  // ── Dados do paciente ──
+  doc.setTextColor(...DK); doc.setFontSize(14); doc.setFont(undefined,'bold');
+  doc.text(pac.nome, mg, y); y+=7;
+  doc.setTextColor(60,60,60); doc.setFontSize(10); doc.setFont(undefined,'normal');
+  doc.text(`Nasc: ${fmtDate(pac.nasc)} · ${pac.altura||'—'}m · ${pac.peso||'—'}kg · Prof: ${prof?.nome||'—'}`, mg, y); y+=6;
+  if (last.esporte) { doc.text(`Modalidade: ${last.esporte}${last.semana_lesao?` · Semana pós-lesão: ${last.semana_lesao}`:''}`, mg, y); y+=6; }
+  doc.text(`Data: ${fmtDate(last.data)} · ${last.tipo==='avaliacao'?'Avaliação inicial':'Reavaliação'}`, mg, y); y+=10;
+
+  function section(title) {
+    if (y > 260) { doc.addPage(); y = 16; }
+    doc.setFillColor(232,245,233); doc.rect(mg-2, y-5, W-mg*2+4, 8, 'F');
+    doc.setTextColor(...DK); doc.setFontSize(11); doc.setFont(undefined,'bold');
+    doc.text(title, mg, y); y+=9;
+    doc.setTextColor(50,50,50); doc.setFont(undefined,'normal'); doc.setFontSize(10);
+  }
+
+  function rowColored(label, val, color=null) {
+    if (y > 270) { doc.addPage(); y = 16; }
+    doc.setTextColor(80,80,80); doc.text(`${label}:`, mg, y);
+    if (color) doc.setTextColor(...color); else doc.setTextColor(50,50,50);
+    doc.text(String(val||'—'), 145, y);
+    doc.setTextColor(50,50,50); y += 5.5;
+  }
+
+  function lsiColorPDF(v) {
+    if (!v || isNaN(v)) return null;
+    const n = parseFloat(v);
+    return n >= 90 ? G : n >= 75 ? A : R;
+  }
+
+  function lsiBar(label, val) {
+    if (!val || isNaN(val)) return;
+    if (y > 268) { doc.addPage(); y = 16; }
+    const v = parseFloat(val);
+    const color = v >= 90 ? G : v >= 75 ? A : R;
+    const barMaxW = W - mg*2 - 50;
+    const filled = Math.min(v/100, 1) * barMaxW;
+    doc.setTextColor(80,80,80); doc.setFontSize(9);
+    doc.text(label, mg, y);
+    doc.setFillColor(220,220,220); doc.rect(mg+40, y-3.5, barMaxW, 4, 'F');
+    doc.setFillColor(...color); doc.rect(mg+40, y-3.5, filled, 4, 'F');
+    // Linha 90%
+    const ref = (90/100)*barMaxW;
+    doc.setDrawColor(200,50,50); doc.setLineWidth(0.3);
+    doc.line(mg+40+ref, y-4.5, mg+40+ref, y+1);
+    doc.setTextColor(...color); doc.setFont(undefined,'bold');
+    doc.text(`${v.toFixed(1)}%`, mg+40+filled+2, y);
+    doc.setFont(undefined,'normal'); doc.setTextColor(50,50,50);
+    y += 8;
+  }
+
+  // ── EVA ──
+  if (last.eva) {
+    section('Dor (EVA)');
+    const evaColor = parseInt(last.eva)<=3?G:parseInt(last.eva)<=6?A:R;
+    rowColored('Escala Visual Analógica', `${last.eva}/10`, evaColor);
+    y+=2;
+  }
+
+  // ── RESUMO CLÍNICO (ambos os modos) ──
+  section('Resumo de LSI — Simetria');
+  const lsiPairs = [
+    ['Single Hop', last.sht_avg_d, last.sht_avg_e],
+    ['Triple Hop', last.tht_avg_d, last.tht_avg_e],
+    ['Crossover', last.cot_avg_d, last.cot_avg_e],
+    ['Side Hop', last.sidehop_d, last.sidehop_e],
+    ['Squat', last.squat_d, last.squat_e],
+    ['Bridge', last.bridge_d, last.bridge_e],
+    ['Dorsiflexão', last.dors_best_d, last.dors_best_e],
+  ].filter(p => p[1] || p[2]);
+  lsiPairs.forEach(([nm, d, e]) => {
+    const lv = (d&&e&&Math.max(d,e)>0) ? (Math.min(d,e)/Math.max(d,e)*100) : null;
+    lsiBar(nm, lv);
+  });
+  if (y > 268) { doc.addPage(); y = 16; }
+  doc.setFontSize(8); doc.setTextColor(150,150,150);
+  doc.text('Linha vermelha = 90% (limiar recomendado para RTP)', mg, y); y+=10;
+
+  // ── Força ──
+  section('Testes de força');
+  const forceItems = [
+    ['Nordic Hamstring', last.nordic, 10, true],
+    ['One-sided Squat D', last.squat_d, 20, true],
+    ['One-sided Squat E', last.squat_e, 20, true],
+    ['Single Leg Bridge D', last.bridge_d, 25, true],
+    ['Single Leg Bridge E', last.bridge_e, 25, true],
+    ['Copenhagen D', last.copenh_d, 15, true],
+    ['Copenhagen E', last.copenh_e, 15, true],
+    ['Core D (s)', last.core_d, 60, true],
+    ['Core E (s)', last.core_e, 60, true],
+  ].filter(i => i[1]);
+  forceItems.forEach(([label, val, ref, higher]) => {
+    const v = parseFloat(val);
+    const color = higher ? (v>=ref?G:v>=ref*.8?A:R) : (v<=ref?G:R);
+    const interp = higher ? (v>=ref?'OK':v>=ref*.8?'Abaixo do ideal':'Déficit') : (v<=ref?'OK':'Acima do limite');
+    rowColored(`  ${label}`, `${n(val)} — ${interp}`, color);
+  });
+  y+=4;
+
+  // ── Gráfico de barras força ──
+  if (forceItems.length >= 2 && y < 220) {
+    if (y > 180) { doc.addPage(); y = 16; }
+    doc.setFontSize(10); doc.setFont(undefined,'bold'); doc.setTextColor(...DK);
+    doc.text('Gráfico — Força (barras)', mg, y); y+=6;
+    const maxVal = Math.max(...forceItems.map(i=>parseFloat(i[1])||0), 1);
+    const chartH = 28; const barW = (W-mg*2-20)/Math.min(forceItems.length,8);
+    forceItems.slice(0,8).forEach((item, idx) => {
+      const v = parseFloat(item[1])||0;
+      const ref = item[2];
+      const color = v>=ref?G:v>=ref*.8?A:R;
+      const bh = (v/maxVal)*chartH;
+      const x = mg+10+idx*barW;
+      doc.setFillColor(...color);
+      doc.rect(x, y+chartH-bh, barW*.7, bh, 'F');
+      doc.setFontSize(7); doc.setTextColor(60,60,60);
+      doc.text(item[0].replace(' D','D').replace(' E','E').substring(0,8), x, y+chartH+4, {maxWidth:barW});
+      doc.setTextColor(...color);
+      doc.text(String(Math.round(v)), x, y+chartH-bh-1);
+    });
+    y+=chartH+14;
+  }
+
+  // ── Escalas funcionais ──
+  const escalas = [
+    ['KOOS dor', last.koos_dor, 80, true],
+    ['KOOS AVD', last.koos_avd, 80, true],
+    ['KOOS Esporte', last.koos_esporte, 70, true],
+    ['IKDC', last.ikdc, 75, true],
+    ['HOOS dor', last.hoos_dor, 80, true],
+    ['ODI', last.odi, 20, false],
+    ['NDI', last.ndi, 8, false],
+    ['DASH', last.dash, 20, false],
+    ['VISA-P', last.visap, 80, true],
+    ['VISA-A', last.visaa, 80, true],
+    ['FAAM AVD', last.faam_avd, 85, true],
+    ['FAAM Esp.', last.faam_esp, 85, true],
+  ].filter(e => e[1]);
+  if (escalas.length) {
+    section('Escalas funcionais');
+    escalas.forEach(([label, val, ref, higher]) => {
+      const v = parseFloat(val);
+      const color = higher?(v>=ref?G:v>=ref*.8?A:R):(v<=ref?G:v<=ref*1.3?A:R);
+      const interp = higher?(v>=ref?'OK':v>=ref*.8?'Atenção':'Déficit'):(v<=ref?'OK':v<=ref*1.3?'Atenção':'Grave');
+      rowColored(`  ${label}`, `${n(val)} — ${interp}`, color);
+    });
+    y+=4;
+  }
+
+  // ── FMS ──
+  if (last.fms_total) {
+    section('FMS — Functional Movement Screen');
+    const fv = parseInt(last.fms_total);
+    const fColor = fv>=14?G:fv>=10?A:R;
+    rowColored('  Total FMS', `${fv}/21 — ${fv>=14?'Padrões adequados':fv>=10?'Atenção — padrões deficientes':'Alto risco de lesão'}`, fColor);
+    y+=4;
+  }
+
+  // ── RTP ──
+  if (last.aclrsi || last.rtp_decisao) {
+    section('Retorno Esportivo (RTP)');
+    const rtpIds = ['rtp_lsi','rtp_forca','rtp_dor','rtp_edema','rtp_psico','rtp_tempo','rtp_agilidade','rtp_treino'];
+    const rtpCount = rtpIds.filter(id=>last[id]).length;
+    rowColored('  Critérios cumpridos', `${rtpCount}/${rtpIds.length}`, rtpCount>=rtpIds.length?G:rtpCount>=6?A:R);
+    if (last.aclrsi) rowColored('  ACL-RSI', `${n(last.aclrsi)}/100`, parseFloat(last.aclrsi)>=65?G:parseFloat(last.aclrsi)>=35?A:R);
+    const map={liberado:'✅ Liberado',condicionado:'⚠️ Com restrições',nao_liberado:'❌ Não liberado',em_progresso:'🔄 Em progresso'};
+    if (last.rtp_decisao) rowColored('  Decisão', map[last.rtp_decisao]||last.rtp_decisao);
+    y+=4;
+  }
+
+  // ── CONTEÚDO ADICIONAL SÓ NO MODO COMPLETO ──
+  if (tipo === 'completo') {
+    // Testes especiais
+    const testEsp = [
+      ['FABER D', last.faber_d], ['FABER E', last.faber_e],
+      ['FADIR D', last.fadir_d], ['FADIR E', last.fadir_e],
+      ['Lasègue D', last.lasegue_d], ['Lasègue E', last.lasegue_e],
+      ['Thomas D', last.thomas_d], ['Thomas E', last.thomas_e],
+      ['Ober D', last.ober_d], ['Ober E', last.ober_e],
+      ['Hawkins D', last.hawkins_d], ['Hawkins E', last.hawkins_e],
+      ['Pivot Shift D', last.pivot_d], ['Pivot Shift E', last.pivot_e],
+      ['Talar Tilt D', last.talar_d], ['Talar Tilt E', last.talar_e],
+    ].filter(t => t[1]);
+    if (testEsp.length) {
+      section('Testes especiais');
+      testEsp.forEach(([label, val]) => {
+        const color = val==='Negativo'?G:val==='Positivo'?R:null;
+        rowColored(`  ${label}`, val, color);
+      });
+      y+=4;
+    }
+
+    // Hop Tests detalhado
+    const hopDetail = [
+      ['Single Hop D', last.sht_avg_d], ['Single Hop E', last.sht_avg_e],
+      ['Triple Hop D', last.tht_avg_d], ['Triple Hop E', last.tht_avg_e],
+      ['Crossover D', last.cot_avg_d], ['Crossover E', last.cot_avg_e],
+      ['CMJ melhor', last.cmj_best],
+    ].filter(h => h[1]);
+    if (hopDetail.length) {
+      section('Hop Tests — detalhes (cm)');
+      hopDetail.forEach(([label, val]) => rowColored(`  ${label}`, n(val)));
+      y+=4;
+    }
+
+    // Mobilidade
+    if (last.dors_best_d || last.dors_best_e) {
+      section('Mobilidade');
+      if (last.dors_best_d) rowColored('  Dorsiflexão D', `${n(last.dors_best_d)} cm`);
+      if (last.dors_best_e) rowColored('  Dorsiflexão E', `${n(last.dors_best_e)} cm`);
+      if (last.lsi_dors) rowColored('  LSI Dorsiflexão', `${n(last.lsi_dors)}%`, lsiColorPDF(last.lsi_dors));
+      y+=4;
+    }
+
+    // Notas clínicas
+    const notas = [
+      ['Testes especiais', last.nota_testes],
+      ['Força/Estabilidade', last.nota_forca],
+      ['Mobilidade', last.nota_mobilidade],
+      ['RTP/Evolução', last.nota_rtp],
+    ].filter(n => n[1]);
+    if (notas.length) {
+      section('Notas clínicas');
+      notas.forEach(([titulo, nota]) => {
+        if (y > 262) { doc.addPage(); y = 16; }
+        doc.setFont(undefined,'bold'); doc.text(`${titulo}:`, mg, y); doc.setFont(undefined,'normal'); y+=5;
+        const lines = doc.splitTextToSize(nota, W-mg*2);
+        lines.forEach(l => { if(y>270){doc.addPage();y=16;} doc.text(l,mg,y); y+=5; });
+        y+=2;
+      });
+    }
+
+    // Comparativo se reavaliação
+    if (hasReav) {
+      section('Comparativo Avaliação × Reavaliação');
+      [
+        ['Nordic', first.nordic, last.nordic],
+        ['Squat D', first.squat_d, last.squat_d],
+        ['Bridge D', first.bridge_d, last.bridge_d],
+        ['Core D', first.core_d, last.core_d],
+        ['Single Hop D', first.sht_avg_d, last.sht_avg_d],
+        ['CMJ', first.cmj_best, last.cmj_best],
+        ['FMS', first.fms_total, last.fms_total],
+        ['IKDC', first.ikdc, last.ikdc],
+        ['ACL-RSI', first.aclrsi, last.aclrsi],
+      ].filter(r => r[1] || r[2]).forEach(([nm, a, b]) => {
+        const pct = a&&b?((b-a)/a*100):null;
+        const color = pct===null?null:pct>0?G:pct<-5?R:A;
+        rowColored(`  ${nm}`, `${n(a)} → ${n(b)}${pct!==null?` (${pct>0?'+':''}${pct.toFixed(1)}%)`:''}`, color);
+      });
+    }
+  }
+
+  // ── Rodapé ──
+  const pages = doc.internal.getNumberOfPages();
+  for (let i=1; i<=pages; i++) {
+    doc.setPage(i);
+    doc.setFontSize(8); doc.setTextColor(180,180,170);
+    doc.text(`Cefise Academy · ${tipoLabel} · Página ${i}/${pages}`, mg, 290);
+    doc.text(new Date().toLocaleDateString('pt-BR'), W-mg, 290, {align:'right'});
+  }
+
+  const suffix = tipo === 'resumo' ? '_Resumo' : '_Completo';
+  doc.save(`${pac.nome.replace(/\s+/g,'_')}_${last.data}${suffix}.pdf`);
+  toast(`PDF ${tipoLabel} gerado!`);
+}
