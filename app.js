@@ -851,20 +851,19 @@ DADOS DA AVALIAÇÃO:
 ${JSON.stringify(contexto, null, 2)}`;
 
   try {
-    const response = await fetch('https://api.anthropic.com/v1/messages', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        model: 'claude-sonnet-4-6',
-        max_tokens: 1000,
-        messages: [{ role: 'user', content: prompt }]
-      })
-    });
-    const data = await response.json();
-    return data.content?.[0]?.text || 'Não foi possível gerar a interpretação.';
-  } catch(e) {
-    console.error('Erro IA:', e);
-    return null;
+    const response = await fetch('/api/interpretacao', {
+  method: 'POST',
+  headers: { 'Content-Type': 'application/json' },
+  body: JSON.stringify({
+    prompt: promptText,  // o texto do prompt que já existe
+    system: systemPrompt, // o system prompt que já existe
+    max_tokens: 2000
+  })
+});
+
+const data = await response.json();
+if (!data.success) throw new Error(data.error || 'Erro na interpretação');
+const interpretacao = data.text;
   }
 }
 
