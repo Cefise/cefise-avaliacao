@@ -855,8 +855,8 @@ ${JSON.stringify(contexto, null, 2)}`;
   method: 'POST',
   headers: { 'Content-Type': 'application/json' },
   body: JSON.stringify({
-    prompt: promptText,  // o texto do prompt que já existe
-    system: systemPrompt, // o system prompt que já existe
+    prompt: prompt,
+    system: 'Você é um fisioterapeuta especialista em reabilitação esportiva e análise clínica.',
     max_tokens: 2000
   })
 });
