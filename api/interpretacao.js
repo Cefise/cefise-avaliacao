@@ -1,65 +1,62 @@
-// Vercel Edge Function — proxy seguro para API Anthropic
-// Arquivo: /api/interpretacao.js
+module.exports = async function handler(req, res) {
+  res.setHeader('Access-Control-Allow-Origin', '*');
+  res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
+  res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
 
-export const config = { runtime: 'edge' };
-
-export default async function handler(req) {
   if (req.method === 'OPTIONS') {
-    return new Response(null, {
-      headers: {
-        'Access-Control-Allow-Origin': '*',
-        'Access-Control-Allow-Methods': 'POST, OPTIONS',
-        'Access-Control-Allow-Headers': 'Content-Type',
-      }
-    });
+    return res.status(200).end();
   }
 
   if (req.method !== 'POST') {
-    return new Response('Method not allowed', { status: 405 });
+    return res.status(405).json({ error: 'Método não permitido' });
+  }
+
+  const apiKey = process.env.ANTHROPIC_API_KEY;
+  if (!apiKey) {
+    return res.status(500).json({
+      success: false,
+      error: 'Chave da API não configurada no Vercel.'
+    });
   }
 
   try {
-    const body = await req.json();
-    const { prompt } = body;
-
-    if (!prompt) {
-      return new Response(JSON.stringify({ error: 'Prompt obrigatório' }), {
-        status: 400,
-        headers: { 'Content-Type': 'application/json' }
-      });
-    }
+    const { prompt, system, max_tokens } = req.body;
 
     const response = await fetch('https://api.anthropic.com/v1/messages', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        'x-api-key': process.env.ANTHROPIC_API_KEY,
+        'x-api-key': apiKey,
         'anthropic-version': '2023-06-01'
       },
       body: JSON.stringify({
-        model: 'claude-haiku-4-5-20251001',
-        max_tokens: 1000,
+        model: 'claude-sonnet-4-6',
+        max_tokens: max_tokens || 2000,
+        system: system || '',
         messages: [{ role: 'user', content: prompt }]
       })
     });
 
-    const data = await response.json();
+    if (!response.ok) {
+      const errorText = await response.text();
+      return res.status(200).json({
+        success: false,
+        error: 'Erro API: ' + response.status + ' - ' + errorText
+      });
+    }
 
-    return new Response(JSON.stringify(data), {
-      headers: {
-        'Content-Type': 'application/json',
-        'Access-Control-Allow-Origin': '*'
-      }
-    });
+    const data = await response.json();
+    const text = data.content
+      .filter(function(item) { return item.type === 'text'; })
+      .map(function(item) { return item.text; })
+      .join('\n');
+
+    return res.status(200).json({ success: true, text: text });
 
   } catch (error) {
-    return new Response(JSON.stringify({ error: error.message }), {
-      status: 500,
-      headers: {
-        'Content-Type': 'application/json',
-        'Access-Control-Allow-Origin': '*'
-      }
+    return res.status(200).json({
+      success: false,
+      error: 'Erro interno: ' + error.message
     });
   }
-}
-
+};
