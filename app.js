@@ -864,7 +864,10 @@ ${JSON.stringify(contexto, null, 2)}`;
 const data = await response.json();
 if (!data.success) throw new Error(data.error || 'Erro na interpretação');
 const interpretacao = data.text;
-  }
+  } catch (error) {
+      console.error('Erro IA:', error);
+      alert('Não foi possível gerar a interpretação: ' + error.message);
+    }
 }
 
 // ─── PDF ──────────────────────────────────────────────────
