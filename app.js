@@ -25,7 +25,7 @@ function nextId(arr) { return arr.length ? Math.max(...arr.map(x=>x.id))+1 : 1; 
 let currentProfId = 1;
 let relCharts = {};
 let dashChart = null;
-let currentRegiao = null;
+let currentRegioes = []; // suporte a múltiplas regiões
 
 // ─── REGIÕES CORPORAIS ─────────────────────────────────────
 
@@ -279,41 +279,50 @@ function renderRegiaoSelector() {
   if(!container) return;
   container.innerHTML = `
     <div style="margin-bottom:16px">
-      <div style="font-size:15px;font-weight:500;margin-bottom:4px">Selecione a região a ser avaliada</div>
-      <div style="font-size:13px;color:#6b7280">Os testes e questionários serão carregados automaticamente</div>
+      <div style="font-size:15px;font-weight:500;margin-bottom:4px">Selecione as regiões a serem avaliadas</div>
+      <div style="font-size:13px;color:#6b7280">Pode selecionar múltiplas regiões — clique para ativar/desativar</div>
     </div>
     <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:10px;margin-bottom:16px">
-      ${Object.entries(REGIOES).map(([key,r])=>`
-        <button onclick="selecionarRegiao('${key}')"
-          style="padding:14px 10px;border-radius:10px;border:2px solid ${currentRegiao===key?r.color:'#e5e7eb'};
-          background:${currentRegiao===key?r.color+'15':'#fff'};cursor:pointer;text-align:center;transition:all .15s;
-          color:${currentRegiao===key?r.color:'#374151'}">
-          <i class="ti ${r.icon}" style="font-size:22px;display:block;margin-bottom:5px;color:${currentRegiao===key?r.color:'#6b7280'}"></i>
-          <span style="font-size:12px;font-weight:500">${r.label}</span>
-        </button>`).join('')}
+      ${Object.entries(REGIOES).map(([key,r])=>{
+        const sel = currentRegioes.includes(key);
+        return `<button onclick="selecionarRegiao('${key}')"
+          style="padding:14px 10px;border-radius:10px;border:2px solid ${sel?r.color:'#e5e7eb'};
+          background:${sel?r.color+'18':'#fff'};cursor:pointer;text-align:center;transition:all .15s;
+          color:${sel?r.color:'#374151'};position:relative">
+          ${sel?`<span style="position:absolute;top:6px;right:8px;background:${r.color};color:#fff;border-radius:50%;width:16px;height:16px;font-size:10px;display:flex;align-items:center;justify-content:center">✓</span>`:''}
+          <i class="ti ${r.icon}" style="font-size:22px;display:block;margin-bottom:5px;color:${sel?r.color:'#6b7280'}"></i>
+          <span style="font-size:12px;font-weight:${sel?'600':'500'}">${r.label}</span>
+        </button>`;
+      }).join('')}
     </div>
-    ${currentRegiao ? `<div style="background:#f0fdf4;border:1px solid #86efac;border-radius:8px;padding:10px 14px;font-size:13px;color:#166534;display:flex;align-items:center;gap:8px">
-      <i class="ti ti-check-circle" style="font-size:18px"></i>
-      <span>Região: <b>${REGIOES[currentRegiao].label}</b> — questionários e testes carregados automaticamente</span>
-    </div>` : ''}`;
+    ${currentRegioes.length ? `<div style="background:#f0fdf4;border:1px solid #86efac;border-radius:8px;padding:10px 14px;font-size:13px;color:#166534;display:flex;align-items:center;gap:8px;flex-wrap:wrap">
+      <i class="ti ti-check-circle" style="font-size:18px;flex-shrink:0"></i>
+      <span>Regiões selecionadas: <b>${currentRegioes.map(k=>REGIOES[k].label).join(', ')}</b></span>
+    </div>` : `<div style="background:#fffbeb;border:1px solid #fcd34d;border-radius:8px;padding:10px 14px;font-size:13px;color:#92400e;display:flex;align-items:center;gap:8px">
+      <i class="ti ti-info-circle" style="font-size:18px"></i>
+      <span>Selecione ao menos uma região para carregar os questionários e testes</span>
+    </div>`}`;
 }
 
 function selecionarRegiao(key) {
-  currentRegiao = key;
+  const idx = currentRegioes.indexOf(key);
+  if(idx >= 0) { currentRegioes.splice(idx, 1); }
+  else { currentRegioes.push(key); }
   renderRegiaoSelector();
   renderQuestionariosTab();
   renderTestesEspeciaisTab();
-  toast('Região: ' + REGIOES[key].label);
+  const msg = currentRegioes.length ? currentRegioes.map(k=>REGIOES[k].label).join(' + ') : 'Nenhuma região';
+  toast('Regiões: ' + msg);
 }
 
 function renderQuestionariosTab() {
   const container = document.getElementById('questionarios-container');
   if(!container) return;
-  if(!currentRegiao) {
+  if(!currentRegioes.length) {
     container.innerHTML = '<div class="empty-state" style="padding:30px"><i class="ti ti-clipboard-list"></i><p>Selecione uma região corporal na aba "Identificação"</p></div>';
     return;
   }
-  const qIds = REGIOES[currentRegiao].questionarios;
+  const qIds = currentRegioes.flatMap(k=>REGIOES[k].questionarios).filter((v,i,a)=>a.indexOf(v)===i);
   if(!qIds.length) {
     container.innerHTML = '<div class="empty-state" style="padding:20px"><p>Nenhum questionário específico para esta região</p></div>';
     return;
@@ -365,9 +374,9 @@ function calcularScore(qId) {
 }
 
 function getScores() {
-  if(!currentRegiao) return {};
+  if(!currentRegioes.length) return {};
   const scores = {};
-  REGIOES[currentRegiao].questionarios.forEach(qId => {
+  currentRegioes.flatMap(k=>REGIOES[k].questionarios).filter((v,i,a)=>a.indexOf(v)===i).forEach(qId => {
     const q = QUESTIONARIOS[qId];
     if(!q) return;
     let total = 0, count = 0, totalPossivel = 0;
@@ -386,11 +395,11 @@ function getScores() {
 function renderTestesEspeciaisTab() {
   const container = document.getElementById('testes-especiais-container');
   if(!container) return;
-  if(!currentRegiao) {
+  if(!currentRegioes.length) {
     container.innerHTML = '<div class="empty-state" style="padding:30px"><i class="ti ti-test-pipe"></i><p>Selecione uma região corporal na aba "Identificação"</p></div>';
     return;
   }
-  const testes = REGIOES[currentRegiao].testes_especiais;
+  const testes = currentRegioes.flatMap(k=>REGIOES[k].testes_especiais).filter((v,i,a)=>a.indexOf(v)===i);
   container.innerHTML = `
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
       ${testes.map(t=>`
@@ -419,9 +428,9 @@ function renderTestesEspeciaisTab() {
 }
 
 function getTestesEspeciais() {
-  if(!currentRegiao) return {};
+  if(!currentRegioes.length) return {};
   const result = {};
-  REGIOES[currentRegiao].testes_especiais.forEach(t => {
+  currentRegioes.flatMap(k=>REGIOES[k].testes_especiais).filter((v,i,a)=>a.indexOf(v)===i).forEach(t => {
     const d = document.getElementById(`te_${t}_d`);
     const e = document.getElementById(`te_${t}_e`);
     const obs = document.getElementById(`te_${t}_obs`);
@@ -499,7 +508,7 @@ function iniciarReavaliacao(pacId) {
   const dataEl = document.getElementById('f-data');
   if(tipoEl) tipoEl.value='reavaliacao';
   if(dataEl) dataEl.value=new Date().toISOString().split('T')[0];
-  if(p.regiao) currentRegiao = p.regiao;
+  if(p.regiao) currentRegioes = Array.isArray(p.regiao) ? p.regiao : [p.regiao];
   showPage('avaliacao'); showTab(0);
   toast('Modo reavaliação — '+p.nome.split(' ')[0]);
 }
@@ -543,7 +552,7 @@ function clearForm() {
     [1,2,3].forEach(i=>{const el=document.getElementById(`${p}${i}-${s}`);if(el)el.value='';});
     const avg=document.getElementById(`${p}-avg-${s}`);if(avg)avg.textContent='—';
   }));
-  currentRegiao=null;
+  currentRegioes=[];
   showTab(0);
   renderRegiaoSelector();
 }
@@ -562,8 +571,8 @@ function salvarAvaliacao() {
       peso:parseFloat(document.getElementById('f-peso')?.value)||null,
       contato:document.getElementById('f-contato')?.value||null,
       profissional_id:currentProfId,
-      regiao: currentRegiao||null,
-      regiao_label: currentRegiao ? REGIOES[currentRegiao].label : null,
+      regiao: currentRegioes.length?currentRegioes:null,
+      regiao_label: currentRegioes.length ? currentRegioes.map(k=>REGIOES[k].label).join(', ') : null,
       created_at:new Date().toISOString()
     };
     db.pacientes.push(pac);
@@ -572,7 +581,7 @@ function salvarAvaliacao() {
     id:nextId(db.avaliacoes), paciente_id:pac.id, profissional_id:currentProfId,
     data:document.getElementById('f-data')?.value||new Date().toISOString().split('T')[0],
     tipo:document.getElementById('f-tipo')?.value||'avaliacao',
-    regiao:currentRegiao||null, regiao_label:currentRegiao?REGIOES[currentRegiao].label:null,
+    regiao:currentRegioes.length?currentRegioes:null, regiao_label:currentRegioes.length?currentRegioes.map(k=>REGIOES[k].label).join(', '):null,
     cirurgia:getRadio('cirurgia'), cirurgia_detalhe:document.getElementById('det-cirurgia')?.value||'',
     hdp:getRadio('hdp'), hdp_detalhe:document.getElementById('det-hdp')?.value||'',
     hda:getRadio('hda'), hda_detalhe:document.getElementById('det-hda')?.value||'',
@@ -651,16 +660,18 @@ function loadRelatorio(pacId) {
       </div>
     </div>` : '';
 
-  const testesHtml = last.testesEspeciais && Object.keys(last.testesEspeciais).length ? `
+  // Filtrar apenas testes com dados preenchidos
+  const testesPreenchidos = last.testesEspeciais ? Object.entries(last.testesEspeciais).filter(([t,v])=>v.d||v.e||v.obs) : [];
+  const testesHtml = testesPreenchidos.length ? `
     <div class="card" style="margin-bottom:16px">
-      <div class="card-title"><i class="ti ti-test-pipe"></i> Testes especiais</div>
+      <div class="card-title"><i class="ti ti-test-pipe"></i> Testes especiais realizados</div>
       <table class="lsi-table">
         <tr><th>Teste</th><th>Direito</th><th>Esquerdo</th><th>Observação</th></tr>
-        ${Object.entries(last.testesEspeciais).map(([t,v])=>`
+        ${testesPreenchidos.map(([t,v])=>`
           <tr>
             <td>${v.nome||t}</td>
-            <td><span class="badge ${v.d==='Positivo'?'badge-red':v.d==='Negativo'?'badge-green':'badge-gray'}">${v.d||'—'}</span></td>
-            <td><span class="badge ${v.e==='Positivo'?'badge-red':v.e==='Negativo'?'badge-green':'badge-gray'}">${v.e||'—'}</span></td>
+            <td>${v.d?`<span class="badge ${v.d==='Positivo'?'badge-red':'badge-green'}">${v.d}</span>`:'—'}</td>
+            <td>${v.e?`<span class="badge ${v.e==='Positivo'?'badge-red':'badge-green'}">${v.e}</span>`:'—'}</td>
             <td style="font-size:12px;color:#6b7280">${v.obs||'—'}</td>
           </tr>`).join('')}
       </table>
@@ -669,11 +680,15 @@ function loadRelatorio(pacId) {
   el.innerHTML = `
   <div class="rel-header">
     <img src="logo.png" alt="Cefise" onerror="this.style.display='none'" style="height:36px;object-fit:contain;filter:brightness(0) invert(1)">
-    <div>
+    <div style="flex:1">
       <h2>${pac.nome}</h2>
       <p>${calcIdade(pac.nasc)} anos · ${pac.peso||'—'}kg · ${pac.altura||'—'}m · Prof: ${prof?.nome||'—'} · Região: ${last.regiao_label||'—'}</p>
     </div>
+    <button onclick="solicitarInterpretacao(${pac.id})" style="padding:8px 14px;background:rgba(255,255,255,0.2);border:1px solid rgba(255,255,255,0.5);border-radius:7px;color:#fff;font-size:13px;cursor:pointer;display:flex;align-items:center;gap:6px;white-space:nowrap">
+      <i class="ti ti-brain" style="font-size:16px"></i> Interpretação IA
+    </button>
   </div>
+  <div id="interpretacao-container"></div>
   ${hasReav?`<div class="reav-banner"><i class="ti ti-arrows-right-left"></i><div>Comparativo disponível — <b>${avals.length}</b> avaliações · ${fmtDate(first.data)} → ${fmtDate(last.data)}</div></div>`:''}
   ${scoresHtml}${testesHtml}
   <div class="grid-2" style="margin-bottom:16px">
@@ -723,6 +738,134 @@ function buildRelCharts(first,last,hasReav) {
   const sCanvas=document.getElementById('rc-sim');
   if(sCanvas) relCharts['rc-sim']=new Chart(sCanvas,{type:'bar',data:{labels:['Single Hop','Triple Hop','Crossover','Squat','Bridge','Core'],datasets:[{label:'Direito',data:[last.sht_avg_d,last.tht_avg_d,last.cot_avg_d,last.squat_d,last.bridge_d,last.core_d],backgroundColor:G+'bb',borderColor:G,borderWidth:1},{label:'Esquerdo',data:[last.sht_avg_e,last.tht_avg_e,last.cot_avg_e,last.squat_e,last.bridge_e,last.core_e],backgroundColor:T+'bb',borderColor:T,borderWidth:1}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'top',labels:{font:{size:11},boxWidth:12}}},scales:{y:{beginAtZero:true}}}});
   if(hasReav) mkBar('rc-ev',['Nordic','Squat D','Squat E','Bridge D','Bridge E','Copenh D'],[first.nordic,first.squat_d,first.squat_e,first.bridge_d,first.bridge_e,first.copenh_d],[last.nordic,last.squat_d,last.squat_e,last.bridge_d,last.bridge_e,last.copenh_d]);
+}
+
+
+
+async function solicitarInterpretacao(pacId) {
+  const container = document.getElementById('interpretacao-container');
+  if(!container) return;
+  container.innerHTML = `
+    <div style="background:#fff;border:1px solid #e5e7eb;border-radius:10px;padding:16px;margin-bottom:16px">
+      <div style="display:flex;align-items:center;gap:10px;color:#185FA5;margin-bottom:8px">
+        <i class="ti ti-brain" style="font-size:20px"></i>
+        <span style="font-weight:600;font-size:14px">Gerando interpretação clínica com IA...</span>
+        <div style="width:18px;height:18px;border:2px solid #185FA5;border-top-color:transparent;border-radius:50%;animation:spin .7s linear infinite"></div>
+      </div>
+      <p style="font-size:13px;color:#6b7280">Analisando os dados da avaliação...</p>
+    </div>`;
+
+  const db = getDB();
+  const pac = db.pacientes.find(p=>p.id===parseInt(pacId));
+  const avals = db.avaliacoes.filter(a=>a.paciente_id===parseInt(pacId)).sort((a,b)=>a.data.localeCompare(b.data));
+  const prof = db.profissionais.find(p=>p.id===avals[avals.length-1]?.profissional_id);
+
+  const texto = await gerarInterpretacao(pac, avals, prof);
+
+  if(!texto) {
+    container.innerHTML = `<div style="background:#fff8f0;border:1px solid #fed7aa;border-radius:10px;padding:14px;margin-bottom:16px;font-size:13px;color:#9a3412">
+      <i class="ti ti-alert-triangle"></i> Não foi possível gerar a interpretação automática. Verifique sua conexão.
+    </div>`;
+    return;
+  }
+
+  // Format the text with markdown-like rendering
+  const formatado = texto
+    .replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
+    .replace(/\n\n/g, '</p><p style="margin-bottom:10px">')
+    .replace(/\n/g, '<br>');
+
+  container.innerHTML = `
+    <div style="background:#fff;border:1px solid #bfdbfe;border-radius:10px;padding:18px;margin-bottom:16px">
+      <div style="display:flex;align-items:center;gap:8px;margin-bottom:14px;padding-bottom:10px;border-bottom:1px solid #e5e7eb">
+        <i class="ti ti-brain" style="font-size:20px;color:#185FA5"></i>
+        <span style="font-weight:600;font-size:14px;color:#185FA5">Interpretação Clínica — Gerada por IA</span>
+        <span style="font-size:11px;color:#6b7280;margin-left:auto">Revise com seu julgamento clínico</span>
+      </div>
+      <div style="font-size:14px;line-height:1.7;color:#374151">
+        <p style="margin-bottom:10px">${formatado}</p>
+      </div>
+      <div style="margin-top:12px;display:flex;gap:8px">
+        <button onclick="copiarInterpretacao()" style="padding:5px 12px;border:1px solid #d1d5db;border-radius:5px;font-size:12px;cursor:pointer;background:#f9fafb">
+          <i class="ti ti-copy"></i> Copiar texto
+        </button>
+        <button onclick="solicitarInterpretacao(${pacId})" style="padding:5px 12px;border:1px solid #d1d5db;border-radius:5px;font-size:12px;cursor:pointer;background:#f9fafb">
+          <i class="ti ti-refresh"></i> Regenerar
+        </button>
+      </div>
+    </div>`;
+}
+
+function copiarInterpretacao() {
+  const el = document.querySelector('#interpretacao-container [style*="line-height"]');
+  if(!el) return;
+  const text = el.innerText;
+  navigator.clipboard.writeText(text).then(()=>toast('Texto copiado!')).catch(()=>toast('Selecione e copie manualmente'));
+}
+
+// ─── INTERPRETAÇÃO CLÍNICA COM IA ────────────────────────
+
+async function gerarInterpretacao(pac, avals, prof) {
+  const last = avals[avals.length-1];
+  const first = avals[0];
+  const hasReav = avals.length > 1;
+
+  const contexto = {
+    paciente: { nome: pac.nome, idade: calcIdade(pac.nasc), peso: pac.peso, altura: pac.altura },
+    regioes: last.regiao_label || '—',
+    tipo: last.tipo,
+    data: last.data,
+    anamnese: {
+      cirurgia: last.cirurgia === 'sim' ? last.cirurgia_detalhe : 'Não',
+      hdp: last.hdp === 'sim' ? last.hdp_detalhe : 'Não',
+      hda: last.hda === 'sim' ? last.hda_detalhe : 'Não',
+      dor: last.dor === 'sim' ? last.dor_detalhe : 'Não'
+    },
+    questionarios: last.scores || {},
+    testes_especiais: last.testesEspeciais || {},
+    forca: { nordic: last.nordic, squat_d: last.squat_d, squat_e: last.squat_e, bridge_d: last.bridge_d, bridge_e: last.bridge_e, copenh_d: last.copenh_d, copenh_e: last.copenh_e, core_d: last.core_d, core_e: last.core_e },
+    hop_tests: {
+      sht: { d: last.sht_avg_d?.toFixed(1), e: last.sht_avg_e?.toFixed(1), lsi: last.sht_avg_e > 0 ? (last.sht_avg_d/last.sht_avg_e*100).toFixed(1) : '—' },
+      tht: { d: last.tht_avg_d?.toFixed(1), e: last.tht_avg_e?.toFixed(1), lsi: last.tht_avg_e > 0 ? (last.tht_avg_d/last.tht_avg_e*100).toFixed(1) : '—' },
+      cot: { d: last.cot_avg_d?.toFixed(1), e: last.cot_avg_e?.toFixed(1), lsi: last.cot_avg_e > 0 ? (last.cot_avg_d/last.cot_avg_e*100).toFixed(1) : '—' },
+    },
+    comparativo: hasReav ? {
+      nordic: { antes: first.nordic, depois: last.nordic },
+      squat_d: { antes: first.squat_d, depois: last.squat_d },
+      bridge_d: { antes: first.bridge_d, depois: last.bridge_d },
+      sht_lsi: { antes: first.sht_avg_e > 0 ? (first.sht_avg_d/first.sht_avg_e*100).toFixed(1) : '—', depois: last.sht_avg_e > 0 ? (last.sht_avg_d/last.sht_avg_e*100).toFixed(1) : '—' }
+    } : null
+  };
+
+  const prompt = `Você é um fisioterapeuta especialista em reabilitação esportiva. Analise os dados desta avaliação clínica e gere uma interpretação profissional em português, organizada em 3 parágrafos:
+
+1. **Achados clínicos**: Descreva os principais achados dos testes especiais, questionários funcionais e avaliação funcional.
+2. **Análise funcional**: Interprete os dados de força muscular e testes de salto (LSI), classificando o nível de comprometimento.
+3. **Conduta recomendada**: Sugira direcionamentos clínicos baseados nos achados (sem fazer diagnóstico médico).
+
+${hasReav ? '4. **Evolução**: Compare com a avaliação anterior e destaque a progressão do paciente.' : ''}
+
+Seja objetivo, use linguagem técnica mas acessível, e baseie-se APENAS nos dados fornecidos. Não invente dados que não estão presentes.
+
+DADOS DA AVALIAÇÃO:
+${JSON.stringify(contexto, null, 2)}`;
+
+  try {
+    const response = await fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        model: 'claude-sonnet-4-6',
+        max_tokens: 1000,
+        messages: [{ role: 'user', content: prompt }]
+      })
+    });
+    const data = await response.json();
+    return data.content?.[0]?.text || 'Não foi possível gerar a interpretação.';
+  } catch(e) {
+    console.error('Erro IA:', e);
+    return null;
+  }
 }
 
 // ─── PDF ──────────────────────────────────────────────────
