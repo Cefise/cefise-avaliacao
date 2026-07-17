@@ -1014,6 +1014,152 @@ function renderProfissionais() {
       </div>
       ${db.profissionais.length>1?`<button class="btn btn-danger btn-sm" onclick="removeProfissional(${p.id})"><i class="ti ti-trash"></i></button>`:''}
     </div>`).join('');
+
+  // Seção de Backup / Sincronização
+  let backupSection = document.getElementById('backup-section');
+  if(!backupSection) {
+    backupSection = document.createElement('div');
+    backupSection.id = 'backup-section';
+    el.parentElement.appendChild(backupSection);
+  }
+  const totalPac = db.pacientes.length;
+  const totalAval = db.avaliacoes.length;
+  backupSection.innerHTML = `
+    <div class="card" style="margin-top:24px">
+      <div class="card-title"><i class="ti ti-database"></i> Backup e Sincronização</div>
+      <p style="font-size:13px;color:#6b7280;margin-bottom:12px">
+        Exporte os dados deste aparelho para importar em outro. Útil para compartilhar entre os 
+        <b>${db.profissionais.length} profissionais</b> cadastrados.
+      </p>
+      <div style="background:#f9fafb;border-radius:8px;padding:12px;margin-bottom:14px;border:1px solid #e5e7eb">
+        <div style="font-size:13px;color:#374151;display:flex;gap:16px;flex-wrap:wrap">
+          <span><b>${totalPac}</b> paciente(s)</span>
+          <span><b>${totalAval}</b> avaliação(ões)</span>
+          <span><b>${db.profissionais.length}</b> profissional(is)</span>
+        </div>
+      </div>
+      <div style="display:flex;gap:10px;flex-wrap:wrap">
+        <button onclick="exportarDados()" class="btn btn-primary" style="display:flex;align-items:center;gap:6px">
+          <i class="ti ti-download"></i> Exportar dados
+        </button>
+        <button onclick="document.getElementById('import-file').click()" class="btn" style="display:flex;align-items:center;gap:6px;border:1px solid #d1d5db;background:#fff">
+          <i class="ti ti-upload"></i> Importar dados
+        </button>
+        <input type="file" id="import-file" accept=".json" style="display:none" onchange="importarDados(event)">
+      </div>
+      <div id="import-status" style="margin-top:10px"></div>
+    </div>`;
+}
+
+// ——— BACKUP: EXPORTAR ———————————————————
+function exportarDados() {
+  const db = getDB();
+  const backup = {
+    _sistema: 'CEFISE Academy',
+    _versao: '1.0',
+    _exportadoEm: new Date().toISOString(),
+    _aparelho: navigator.userAgent.substring(0, 60),
+    profissionais: db.profissionais,
+    pacientes: db.pacientes,
+    avaliacoes: db.avaliacoes
+  };
+  const blob = new Blob([JSON.stringify(backup, null, 2)], { type: 'application/json' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = `cefise_backup_${new Date().toISOString().slice(0,10)}.json`;
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+  toast('Backup exportado!');
+}
+
+// ——— BACKUP: IMPORTAR ———————————————————
+function importarDados(event) {
+  const file = event.target.files[0];
+  if(!file) return;
+  const statusEl = document.getElementById('import-status');
+
+  const reader = new FileReader();
+  reader.onload = function(e) {
+    try {
+      const backup = JSON.parse(e.target.result);
+
+      // Validar estrutura
+      if(!backup.pacientes || !backup.avaliacoes || !backup.profissionais) {
+        statusEl.innerHTML = '<div style="color:#c62828;font-size:13px;padding:8px;background:#fef2f2;border-radius:6px"><i class="ti ti-alert-circle"></i> Arquivo inválido — não contém dados do CEFISE Academy.</div>';
+        return;
+      }
+
+      const db = getDB();
+
+      // Contadores
+      let novosProf = 0, novosPac = 0, novasAval = 0, ignorados = 0;
+
+      // Mapear IDs antigos → novos para profissionais
+      const profMap = {};
+      backup.profissionais.forEach(bp => {
+        const existe = db.profissionais.find(p => p.nome.toLowerCase() === bp.nome.toLowerCase());
+        if(existe) {
+          profMap[bp.id] = existe.id;
+        } else {
+          const novoId = nextId(db.profissionais);
+          profMap[bp.id] = novoId;
+          db.profissionais.push({ id: novoId, nome: bp.nome, especialidade: bp.especialidade || 'Fisioterapeuta', crf: bp.crf || '' });
+          novosProf++;
+        }
+      });
+
+      // Mapear IDs antigos → novos para pacientes
+      const pacMap = {};
+      backup.pacientes.forEach(bp => {
+        const existe = db.pacientes.find(p => p.nome.toLowerCase() === bp.nome.toLowerCase() && p.nasc === bp.nasc);
+        if(existe) {
+          pacMap[bp.id] = existe.id;
+        } else {
+          const novoId = nextId(db.pacientes);
+          pacMap[bp.id] = novoId;
+          db.pacientes.push({ ...bp, id: novoId });
+          novosPac++;
+        }
+      });
+
+      // Importar avaliações (evitar duplicatas pela data + paciente)
+      backup.avaliacoes.forEach(ba => {
+        const pacIdNovo = pacMap[ba.paciente_id];
+        const profIdNovo = profMap[ba.profissional_id] || profMap[Object.keys(profMap)[0]];
+        if(!pacIdNovo) return;
+
+        const duplicata = db.avaliacoes.find(a => a.paciente_id === pacIdNovo && a.data === ba.data && a.tipo === ba.tipo);
+        if(duplicata) {
+          ignorados++;
+          return;
+        }
+
+        const novoId = nextId(db.avaliacoes);
+        db.avaliacoes.push({ ...ba, id: novoId, paciente_id: pacIdNovo, profissional_id: profIdNovo });
+        novasAval++;
+      });
+
+      saveDB(db);
+      updateProfSelects();
+      renderProfissionais();
+
+      statusEl.innerHTML = `<div style="color:#166534;font-size:13px;padding:10px;background:#f0fdf4;border-radius:6px;border:1px solid #bbf7d0">
+        <i class="ti ti-check"></i> <b>Importação concluída!</b><br>
+        <span style="font-size:12px;color:#374151;margin-top:4px;display:block">
+          ${novosProf} profissional(is) · ${novosPac} paciente(s) · ${novasAval} avaliação(ões) adicionados
+          ${ignorados ? ` · ${ignorados} duplicata(s) ignorada(s)` : ''}
+        </span>
+      </div>`;
+      toast('Dados importados!');
+    } catch(err) {
+      statusEl.innerHTML = `<div style="color:#c62828;font-size:13px;padding:8px;background:#fef2f2;border-radius:6px"><i class="ti ti-alert-circle"></i> Erro ao ler arquivo: ${err.message}</div>`;
+    }
+  };
+  reader.readAsText(file);
+  event.target.value = '';
 }
 
 function showModalProf() {
