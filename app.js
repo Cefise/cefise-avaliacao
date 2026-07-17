@@ -209,6 +209,10 @@ function fmtDate(d) { if(!d) return '—'; const [y,m,day]=d.split('-'); return 
 // ─── INIT ─────────────────────────────────────────────────
 
 window.addEventListener('DOMContentLoaded', () => {
+  // CSS para accordion dos questionários
+  const accStyle = document.createElement('style');
+  accStyle.textContent = '.accordion-open{max-height:600px!important;} .acc-rotated{transform:rotate(180deg);}';
+  document.head.appendChild(accStyle);
   setupRadioToggles();
   const dataEl = document.getElementById('f-data');
   if(dataEl) dataEl.value = new Date().toISOString().split('T')[0];
@@ -643,38 +647,55 @@ function loadRelatorio(pacId) {
 
   const scoresHtml = last.scores && Object.keys(last.scores).length ? `
     <div class="card" style="margin-bottom:16px">
-      <div class="card-title"><i class="ti ti-clipboard-check"></i> Questionários funcionais — ${last.regiao_label||'—'}</div>
-      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:10px">
-        ${Object.entries(last.scores).map(([qId,s])=>{
-          const pct=parseFloat(s.pct);
-          const color=pct<=30?'#2d7d32':pct<=60?'#854F0B':'#c62828';
-          return `<div style="background:#f9fafb;border-radius:8px;padding:12px;border:1px solid #e5e7eb">
-            <div style="font-size:12px;font-weight:600;color:#6b7280;margin-bottom:3px">${s.abrev||qId}</div>
-            <div style="font-size:22px;font-weight:600;color:${color}">${s.pct}%</div>
-            <div style="font-size:11px;color:#9b9b94">comprometimento</div>
-            <div style="height:4px;background:#e5e7eb;border-radius:2px;margin-top:6px">
-              <div style="height:4px;border-radius:2px;background:${color};width:${Math.min(s.pct,100)}%"></div>
-            </div>
-          </div>`;
-        }).join('')}
+      <div class="card-title" style="cursor:pointer;display:flex;align-items:center;justify-content:space-between" onclick="this.parentElement.querySelector('.accordion-body').classList.toggle('accordion-open');this.querySelector('.acc-icon').classList.toggle('acc-rotated')">
+        <span><i class="ti ti-clipboard-check"></i> Questionários funcionais — ${last.regiao_label||'—'}</span>
+        <span style="display:flex;align-items:center;gap:8px">
+          <span style="font-size:12px;color:#6b7280;font-weight:400">${Object.entries(last.scores).map(([qId,s])=>`${s.abrev||qId}: ${s.pct}%`).join(' · ')}</span>
+          <i class="ti ti-chevron-down acc-icon" style="font-size:16px;transition:transform .2s;color:#6b7280"></i>
+        </span>
+      </div>
+      <div class="accordion-body" style="max-height:0;overflow:hidden;transition:max-height .3s ease">
+        <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:10px;padding-top:12px">
+          ${Object.entries(last.scores).map(([qId,s])=>{
+            const pct=parseFloat(s.pct);
+            const color=pct<=30?'#2d7d32':pct<=60?'#854F0B':'#c62828';
+            return `<div style="background:#f9fafb;border-radius:8px;padding:12px;border:1px solid #e5e7eb">
+              <div style="font-size:12px;font-weight:600;color:#6b7280;margin-bottom:3px">${s.abrev||qId}</div>
+              <div style="font-size:22px;font-weight:600;color:${color}">${s.pct}%</div>
+              <div style="font-size:11px;color:#9b9b94">comprometimento</div>
+              <div style="height:4px;background:#e5e7eb;border-radius:2px;margin-top:6px">
+                <div style="height:4px;border-radius:2px;background:${color};width:${Math.min(s.pct,100)}%"></div>
+              </div>
+            </div>`;
+          }).join('')}
+        </div>
       </div>
     </div>` : '';
 
   // Filtrar apenas testes com dados preenchidos
   const testesPreenchidos = last.testesEspeciais ? Object.entries(last.testesEspeciais).filter(([t,v])=>v.d||v.e||v.obs) : [];
+  const posCount = testesPreenchidos.filter(([t,v])=>v.d==='Positivo'||v.e==='Positivo').length;
   const testesHtml = testesPreenchidos.length ? `
     <div class="card" style="margin-bottom:16px">
-      <div class="card-title"><i class="ti ti-test-pipe"></i> Testes especiais realizados</div>
-      <table class="lsi-table">
-        <tr><th>Teste</th><th>Direito</th><th>Esquerdo</th><th>Observação</th></tr>
-        ${testesPreenchidos.map(([t,v])=>`
-          <tr>
-            <td>${v.nome||t}</td>
-            <td>${v.d?`<span class="badge ${v.d==='Positivo'?'badge-red':'badge-green'}">${v.d}</span>`:'—'}</td>
-            <td>${v.e?`<span class="badge ${v.e==='Positivo'?'badge-red':'badge-green'}">${v.e}</span>`:'—'}</td>
-            <td style="font-size:12px;color:#6b7280">${v.obs||'—'}</td>
-          </tr>`).join('')}
-      </table>
+      <div class="card-title" style="cursor:pointer;display:flex;align-items:center;justify-content:space-between" onclick="this.parentElement.querySelector('.accordion-body').classList.toggle('accordion-open');this.querySelector('.acc-icon').classList.toggle('acc-rotated')">
+        <span><i class="ti ti-test-pipe"></i> Testes especiais realizados</span>
+        <span style="display:flex;align-items:center;gap:8px">
+          <span style="font-size:12px;color:#6b7280;font-weight:400">${testesPreenchidos.length} testes${posCount?' · '+posCount+' positivo(s)':''}</span>
+          <i class="ti ti-chevron-down acc-icon" style="font-size:16px;transition:transform .2s;color:#6b7280"></i>
+        </span>
+      </div>
+      <div class="accordion-body" style="max-height:0;overflow:hidden;transition:max-height .3s ease">
+        <table class="lsi-table" style="margin-top:12px">
+          <tr><th>Teste</th><th>Direito</th><th>Esquerdo</th><th>Observação</th></tr>
+          ${testesPreenchidos.map(([t,v])=>`
+            <tr>
+              <td>${v.nome||t}</td>
+              <td>${v.d?`<span class="badge ${v.d==='Positivo'?'badge-red':'badge-green'}">${v.d}</span>`:'—'}</td>
+              <td>${v.e?`<span class="badge ${v.e==='Positivo'?'badge-red':'badge-green'}">${v.e}</span>`:'—'}</td>
+              <td style="font-size:12px;color:#6b7280">${v.obs||'—'}</td>
+            </tr>`).join('')}
+        </table>
+      </div>
     </div>` : '';
 
   el.innerHTML = `
@@ -775,6 +796,9 @@ async function solicitarInterpretacao(pacId) {
     .replace(/\n\n/g, '</p><p style="margin-bottom:10px">')
     .replace(/\n/g, '<br>');
 
+  // Salvar interpretação para uso no PDF
+  try { localStorage.setItem('cefise_last_interpretacao', JSON.stringify({ pacId: pacId, texto: texto, data: new Date().toISOString() })); } catch(e) {}
+
   container.innerHTML = `
     <div style="background:#fff;border:1px solid #bfdbfe;border-radius:10px;padding:18px;margin-bottom:16px">
       <div style="display:flex;align-items:center;gap:8px;margin-bottom:14px;padding-bottom:10px;border-bottom:1px solid #e5e7eb">
@@ -810,6 +834,30 @@ async function gerarInterpretacao(pac, avals, prof) {
   const first = avals[0];
   const hasReav = avals.length > 1;
 
+  // Filtrar apenas dados que foram efetivamente preenchidos
+  const forcaRaw = { nordic: last.nordic, squat_d: last.squat_d, squat_e: last.squat_e, bridge_d: last.bridge_d, bridge_e: last.bridge_e, copenh_d: last.copenh_d, copenh_e: last.copenh_e, core_d: last.core_d, core_e: last.core_e };
+  const forcaFiltrada = {};
+  Object.entries(forcaRaw).forEach(([k,v]) => { if(v && v > 0) forcaFiltrada[k] = v; });
+
+  const hopRaw = {
+    sht: { d: last.sht_avg_d, e: last.sht_avg_e },
+    tht: { d: last.tht_avg_d, e: last.tht_avg_e },
+    cot: { d: last.cot_avg_d, e: last.cot_avg_e }
+  };
+  const hopFiltrado = {};
+  Object.entries(hopRaw).forEach(([k,v]) => {
+    if((v.d && v.d > 0) || (v.e && v.e > 0)) {
+      hopFiltrado[k] = { d: Number(v.d||0).toFixed(1), e: Number(v.e||0).toFixed(1), lsi: v.e > 0 ? (v.d/v.e*100).toFixed(1) : '—' };
+    }
+  });
+
+  const testesPreenchidos = {};
+  if(last.testesEspeciais) {
+    Object.entries(last.testesEspeciais).forEach(([k,v]) => {
+      if(v.d || v.e || v.obs) testesPreenchidos[k] = v;
+    });
+  }
+
   const contexto = {
     paciente: { nome: pac.nome, idade: calcIdade(pac.nasc), peso: pac.peso, altura: pac.altura },
     regioes: last.regiao_label || '—',
@@ -820,32 +868,34 @@ async function gerarInterpretacao(pac, avals, prof) {
       hdp: last.hdp === 'sim' ? last.hdp_detalhe : 'Não',
       hda: last.hda === 'sim' ? last.hda_detalhe : 'Não',
       dor: last.dor === 'sim' ? last.dor_detalhe : 'Não'
-    },
-    questionarios: last.scores || {},
-    testes_especiais: last.testesEspeciais || {},
-    forca: { nordic: last.nordic, squat_d: last.squat_d, squat_e: last.squat_e, bridge_d: last.bridge_d, bridge_e: last.bridge_e, copenh_d: last.copenh_d, copenh_e: last.copenh_e, core_d: last.core_d, core_e: last.core_e },
-    hop_tests: {
-      sht: { d: last.sht_avg_d?.toFixed(1), e: last.sht_avg_e?.toFixed(1), lsi: last.sht_avg_e > 0 ? (last.sht_avg_d/last.sht_avg_e*100).toFixed(1) : '—' },
-      tht: { d: last.tht_avg_d?.toFixed(1), e: last.tht_avg_e?.toFixed(1), lsi: last.tht_avg_e > 0 ? (last.tht_avg_d/last.tht_avg_e*100).toFixed(1) : '—' },
-      cot: { d: last.cot_avg_d?.toFixed(1), e: last.cot_avg_e?.toFixed(1), lsi: last.cot_avg_e > 0 ? (last.cot_avg_d/last.cot_avg_e*100).toFixed(1) : '—' },
-    },
-    comparativo: hasReav ? {
-      nordic: { antes: first.nordic, depois: last.nordic },
-      squat_d: { antes: first.squat_d, depois: last.squat_d },
-      bridge_d: { antes: first.bridge_d, depois: last.bridge_d },
-      sht_lsi: { antes: first.sht_avg_e > 0 ? (first.sht_avg_d/first.sht_avg_e*100).toFixed(1) : '—', depois: last.sht_avg_e > 0 ? (last.sht_avg_d/last.sht_avg_e*100).toFixed(1) : '—' }
-    } : null
+    }
   };
 
-  const prompt = `Você é um fisioterapeuta especialista em reabilitação esportiva. Analise os dados desta avaliação clínica e gere uma interpretação profissional em português, organizada em 3 parágrafos:
+  // Só incluir seções que têm dados
+  if(last.scores && Object.keys(last.scores).length) contexto.questionarios = last.scores;
+  if(Object.keys(testesPreenchidos).length) contexto.testes_especiais = testesPreenchidos;
+  if(Object.keys(forcaFiltrada).length) contexto.forca = forcaFiltrada;
+  if(Object.keys(hopFiltrado).length) contexto.hop_tests = hopFiltrado;
 
-1. **Achados clínicos**: Descreva os principais achados dos testes especiais, questionários funcionais e avaliação funcional.
-2. **Análise funcional**: Interprete os dados de força muscular e testes de salto (LSI), classificando o nível de comprometimento.
-3. **Conduta recomendada**: Sugira direcionamentos clínicos baseados nos achados (sem fazer diagnóstico médico).
+  if(hasReav) {
+    const comp = {};
+    if(first.nordic || last.nordic) comp.nordic = { antes: first.nordic, depois: last.nordic };
+    if(first.squat_d || last.squat_d) comp.squat_d = { antes: first.squat_d, depois: last.squat_d };
+    if(first.bridge_d || last.bridge_d) comp.bridge_d = { antes: first.bridge_d, depois: last.bridge_d };
+    if((first.sht_avg_e > 0) || (last.sht_avg_e > 0)) comp.sht_lsi = { antes: first.sht_avg_e > 0 ? (first.sht_avg_d/first.sht_avg_e*100).toFixed(1) : '—', depois: last.sht_avg_e > 0 ? (last.sht_avg_d/last.sht_avg_e*100).toFixed(1) : '—' };
+    if(Object.keys(comp).length) contexto.comparativo = comp;
+  }
 
-${hasReav ? '4. **Evolução**: Compare com a avaliação anterior e destaque a progressão do paciente.' : ''}
+  const secoesPrompt = ['1. **Achados clínicos**: Descreva os principais achados dos testes e questionários que foram realizados.'];
+  if(contexto.forca || contexto.hop_tests) secoesPrompt.push('2. **Análise funcional**: Interprete os dados de força muscular e/ou testes de salto (LSI) presentes, classificando o nível de comprometimento.');
+  secoesPrompt.push(`${secoesPrompt.length+1}. **Conduta recomendada**: Sugira direcionamentos clínicos baseados nos achados (sem fazer diagnóstico médico).`);
+  if(hasReav && contexto.comparativo) secoesPrompt.push(`${secoesPrompt.length+1}. **Evolução**: Compare com a avaliação anterior e destaque a progressão do paciente.`);
 
-Seja objetivo, use linguagem técnica mas acessível, e baseie-se APENAS nos dados fornecidos. Não invente dados que não estão presentes.
+  const prompt = `Você é um fisioterapeuta especialista em reabilitação esportiva. Analise os dados desta avaliação clínica e gere uma interpretação profissional em português, organizada em parágrafos:
+
+${secoesPrompt.join('\n')}
+
+IMPORTANTE: Baseie-se APENAS nos dados fornecidos abaixo. Se uma seção (força, hop tests, questionários) não aparece nos dados, significa que NÃO foi avaliada — não mencione, não invente e não comente sobre a ausência. Interprete somente o que foi efetivamente realizado.
 
 DADOS DA AVALIAÇÃO:
 ${JSON.stringify(contexto, null, 2)}`;
@@ -912,6 +962,23 @@ function gerarPDF() {
     sec('Comparativo — Antes × Depois');
     [['Nordic',first.nordic,last.nordic],['Squat D',first.squat_d,last.squat_d],['Bridge D',first.bridge_d,last.bridge_d],['Core D',first.core_d,last.core_d]].forEach(([n,a,b])=>{const p=a?((b-a)/a*100).toFixed(1):0;doc.text(`${n}: ${a||0} → ${b||0}  (${p>0?'+':''}${p}%)`,mg,y);y+=5.5;});
   }
+  // Interpretação IA (se disponível)
+  try {
+    const interp = JSON.parse(localStorage.getItem('cefise_last_interpretacao') || '{}');
+    if(interp.pacId === parseInt(pacId) && interp.texto) {
+      if(y > 220) { doc.addPage(); y = 20; }
+      sec('Interpretação Clínica — IA');
+      const textoLimpo = interp.texto.replace(/\*\*/g, '').replace(/#{1,3}\s?/g, '');
+      const linhas = doc.splitTextToSize(textoLimpo, W - mg * 2);
+      doc.setFontSize(9); doc.setTextColor(60,60,60);
+      linhas.forEach(function(linha) {
+        if(y > 275) { doc.addPage(); y = 20; }
+        doc.text(linha, mg, y); y += 4.5;
+      });
+      y += 4;
+    }
+  } catch(e) {}
+
   doc.setFontSize(8);doc.setTextColor(160,160,150);doc.text('Cefise Academy — Sistema de Avaliação Clínica',mg,287);
   doc.save(`Avaliacao_${pac.nome.replace(/\s+/g,'_')}_${last.data}.pdf`);
   toast('PDF gerado!');
