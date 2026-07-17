@@ -211,8 +211,7 @@ function fmtDate(d) { if(!d) return '—'; const [y,m,day]=d.split('-'); return 
 window.addEventListener('DOMContentLoaded', () => {
   // CSS para accordion dos questionários
   const accStyle = document.createElement('style');
-  accStyle.textContent = '.accordion-open{max-height:600px!important;} .acc-rotated{transform:rotate(180deg);}';
-  document.head.appendChild(accStyle);
+  accStyle.textContent = '.accordion-open{max-height:2000px!important;} .acc-rotated{transform:rotate(180deg)!important;}';  document.head.appendChild(accStyle);
   setupRadioToggles();
   const dataEl = document.getElementById('f-data');
   if(dataEl) dataEl.value = new Date().toISOString().split('T')[0];
@@ -335,25 +334,35 @@ function renderQuestionariosTab() {
     const q = QUESTIONARIOS[qId];
     if(!q) return '';
     return `<div class="card" style="margin-bottom:16px">
-      <div class="card-title" style="font-size:14px;font-weight:600;margin-bottom:14px">
-        <i class="ti ti-clipboard-check"></i> ${q.nome}
+      <div class="card-title" style="font-size:14px;font-weight:600;margin-bottom:0;cursor:pointer;display:flex;align-items:center;justify-content:space-between" onclick="this.parentElement.querySelector('.accordion-body').classList.toggle('accordion-open');this.querySelector('.acc-icon').classList.toggle('acc-rotated')">
+        <span><i class="ti ti-clipboard-check"></i> ${q.abrev}</span>
+        <span style="display:flex;align-items:center;gap:8px">
+          <span id="score_summary_${qId}" style="font-size:12px;color:#6b7280;font-weight:400"></span>
+          <i class="ti ti-chevron-down acc-icon" style="font-size:16px;transition:transform .2s;color:#6b7280"></i>
+        </span>
       </div>
-      ${q.grupos.map((grupo,gi) => `
-        <div style="margin-bottom:14px">
-          <div style="font-size:11px;font-weight:600;color:#6b7280;text-transform:uppercase;letter-spacing:.5px;margin-bottom:8px;padding-bottom:4px;border-bottom:1px solid #f0f0e8">${grupo.grupo}</div>
-          ${grupo.perguntas.map((perg,pi) => `
-            <div style="margin-bottom:6px;display:flex;align-items:center;gap:10px;padding:6px 8px;background:#f9fafb;border-radius:6px">
-              <div style="flex:1;font-size:13px;color:#374151">${perg}</div>
-              <select id="q_${qId}_${gi}_${pi}" style="width:180px;padding:4px 6px;border:1px solid #d1d5db;border-radius:4px;font-size:12px">
-                <option value="">— selecione —</option>
-                ${q.escala.map((op,oi)=>`<option value="${oi}">${op}</option>`).join('')}
-              </select>
+      <div style="font-size:11px;color:#9b9b94;margin-top:2px;margin-bottom:4px">${q.nome}</div>
+      <div class="accordion-body" style="max-height:0;overflow:hidden;transition:max-height .3s ease">
+        <div style="padding-top:10px">
+          ${q.grupos.map((grupo,gi) => `
+            <div style="margin-bottom:14px">
+              <div style="font-size:11px;font-weight:600;color:#6b7280;text-transform:uppercase;letter-spacing:.5px;margin-bottom:8px;padding-bottom:4px;border-bottom:1px solid #f0f0e8">${grupo.grupo}</div>
+              ${grupo.perguntas.map((perg,pi) => `
+                <div style="margin-bottom:6px;display:flex;align-items:center;gap:10px;padding:6px 8px;background:#f9fafb;border-radius:6px">
+                  <div style="flex:1;font-size:13px;color:#374151">${perg}</div>
+                  <select id="q_${qId}_${gi}_${pi}" style="width:180px;padding:4px 6px;border:1px solid #d1d5db;border-radius:4px;font-size:12px">
+                    <option value="">— selecione —</option>
+                    ${q.escala.map((op,oi)=>`<option value="${oi}">${op}</option>`).join('')}
+                  </select>
+                </div>`).join('')}
             </div>`).join('')}
-        </div>`).join('')}
-      <div style="background:#f0fdf4;border-radius:6px;padding:8px 12px;font-size:12px;color:#166534;margin-top:8px;display:flex;align-items:center;gap:8px">
-        <b>Pontuação:</b> <span id="score_${qId}">—</span>
-        <button onclick="calcularScore('${qId}')" style="padding:3px 10px;border:1px solid #86efac;background:#dcfce7;border-radius:4px;font-size:11px;cursor:pointer;color:#166534">Calcular</button>
+          <div style="background:#f0fdf4;border-radius:6px;padding:8px 12px;font-size:12px;color:#166534;margin-top:8px;display:flex;align-items:center;gap:8px">
+            <b>Pontuação:</b> <span id="score_${qId}">—</span>
+            <button onclick="calcularScore('${qId}')" style="padding:3px 10px;border:1px solid #86efac;background:#dcfce7;border-radius:4px;font-size:11px;cursor:pointer;color:#166534">Calcular</button>
+          </div>
+        </div>
       </div>
+    </div>`;
     </div>`;
   }).join('');
 }
@@ -374,6 +383,8 @@ function calcularScore(qId) {
     if(count === 0) { scoreEl.textContent = 'Nenhuma resposta'; return; }
     const pct = (total / totalPossivel * 100).toFixed(1);
     scoreEl.textContent = `${total} pts (${pct}% comprometimento) — ${count} respostas`;
+    const summaryEl = document.getElementById(`score_summary_${qId}`);
+    if(summaryEl) summaryEl.textContent = `${pct}% comprometimento`;
   }
 }
 
@@ -698,6 +709,10 @@ function loadRelatorio(pacId) {
       </div>
     </div>` : '';
 
+  // Verificar se há dados de força e hop tests
+  const hasForca = [last.nordic,last.squat_d,last.squat_e,last.bridge_d,last.bridge_e,last.copenh_d,last.copenh_e,last.core_d,last.core_e].some(v=>v&&v>0);
+  const hasHop = [last.sht_avg_d,last.sht_avg_e,last.tht_avg_d,last.tht_avg_e,last.cot_avg_d,last.cot_avg_e].some(v=>v&&v>0);
+
   el.innerHTML = `
   <div class="rel-header">
     <img src="logo.png" alt="Cefise" onerror="this.style.display='none'" style="height:36px;object-fit:contain;filter:brightness(0) invert(1)">
@@ -712,34 +727,34 @@ function loadRelatorio(pacId) {
   <div id="interpretacao-container"></div>
   ${hasReav?`<div class="reav-banner"><i class="ti ti-arrows-right-left"></i><div>Comparativo disponível — <b>${avals.length}</b> avaliações · ${fmtDate(first.data)} → ${fmtDate(last.data)}</div></div>`:''}
   ${scoresHtml}${testesHtml}
-  <div class="grid-2" style="margin-bottom:16px">
+  ${hasForca?`<div class="grid-2" style="margin-bottom:16px">
     <div class="card"><div class="card-title"><i class="ti ti-barbell"></i> Força muscular</div><div class="chart-wrap" style="height:240px"><canvas id="rc-forca"></canvas></div></div>
-    <div class="card"><div class="card-title"><i class="ti ti-run"></i> Hop Tests — LSI (%)</div><div class="chart-wrap" style="height:240px"><canvas id="rc-hop"></canvas></div></div>
-  </div>
-  <div class="card" style="margin-bottom:16px">
+    ${hasHop?`<div class="card"><div class="card-title"><i class="ti ti-run"></i> Hop Tests — LSI (%)</div><div class="chart-wrap" style="height:240px"><canvas id="rc-hop"></canvas></div></div>`:''}
+  </div>`:''}
+  ${(hasForca||hasHop)?`<div class="card" style="margin-bottom:16px">
     <div class="card-title"><i class="ti ti-arrows-left-right"></i> Simetria D × E</div>
     <div class="chart-wrap" style="height:260px"><canvas id="rc-sim"></canvas></div>
-  </div>
+  </div>`:''}
   ${hasReav?`<div class="card" style="margin-bottom:16px">
     <div class="card-title"><i class="ti ti-trending-up"></i> Evolução — antes × depois</div>
     <div class="grid-2">
       <table class="comp-table">
         <tr><th>Teste</th><th>Antes</th><th>Depois</th><th>Variação</th></tr>
-        ${[['Nordic',first.nordic,last.nordic],['Squat D',first.squat_d,last.squat_d],['Squat E',first.squat_e,last.squat_e],['Bridge D',first.bridge_d,last.bridge_d],['Core D',first.core_d,last.core_d]].map(([n,a,b])=>`<tr><td>${n}</td><td>${a||'—'}</td><td>${b||'—'}</td><td>${diff(a,b)}</td></tr>`).join('')}
+        ${[['Nordic',first.nordic,last.nordic],['Squat D',first.squat_d,last.squat_d],['Squat E',first.squat_e,last.squat_e],['Bridge D',first.bridge_d,last.bridge_d],['Core D',first.core_d,last.core_d]].filter(([n,a,b])=>a||b).map(([n,a,b])=>`<tr><td>${n}</td><td>${a||'—'}</td><td>${b||'—'}</td><td>${diff(a,b)}</td></tr>`).join('')}
       </table>
       <div class="chart-wrap" style="height:300px"><canvas id="rc-ev"></canvas></div>
     </div>
   </div>`:''}
-  <div class="card">
+  ${(hasForca||hasHop)?`<div class="card">
     <div class="card-title"><i class="ti ti-table"></i> LSI — Índice de simetria</div>
     <table class="lsi-table">
       <tr><th>Teste</th><th>Direito</th><th>Esquerdo</th><th>LSI</th><th>Classificação</th></tr>
-      ${[['Single Hop',last.sht_avg_d,last.sht_avg_e],['Triple Hop',last.tht_avg_d,last.tht_avg_e],['Crossover',last.cot_avg_d,last.cot_avg_e],['Squat',last.squat_d,last.squat_e],['Bridge',last.bridge_d,last.bridge_e],['Core',last.core_d,last.core_e]].map(([n,d,e])=>{
+      ${[['Single Hop',last.sht_avg_d,last.sht_avg_e],['Triple Hop',last.tht_avg_d,last.tht_avg_e],['Crossover',last.cot_avg_d,last.cot_avg_e],['Squat',last.squat_d,last.squat_e],['Bridge',last.bridge_d,last.bridge_e],['Core',last.core_d,last.core_e]].filter(([n,d,e])=>d||e).map(([n,d,e])=>{
         const lv=e>0?d/e*100:0;
         return `<tr><td>${n}</td><td>${Number(d||0).toFixed(1)}</td><td>${Number(e||0).toFixed(1)}</td><td><b>${lv.toFixed(1)}%</b></td><td><span class="badge ${lsiClass(lv)}">${lsiLabel(lv)}</span></td></tr>`;
       }).join('')}
     </table>
-  </div>`;
+  </div>`:''}`;
   setTimeout(()=>buildRelCharts(first,last,hasReav),80);
 }
 
