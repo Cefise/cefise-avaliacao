@@ -363,7 +363,6 @@ function renderQuestionariosTab() {
         </div>
       </div>
     </div>`;
-    </div>`;
   }).join('');
 }
 
