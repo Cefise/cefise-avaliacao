@@ -720,7 +720,7 @@ function loadRelatorio(pacId) {
       <p>${calcIdade(pac.nasc)} anos · ${pac.peso||'—'}kg · ${pac.altura||'—'}m · Prof: ${prof?.nome||'—'} · Região: ${last.regiao_label||'—'}</p>
     </div>
     <button onclick="solicitarInterpretacao(${pac.id})" style="padding:8px 14px;background:rgba(255,255,255,0.2);border:1px solid rgba(255,255,255,0.5);border-radius:7px;color:#fff;font-size:13px;cursor:pointer;display:flex;align-items:center;gap:6px;white-space:nowrap">
-      <i class="ti ti-brain" style="font-size:16px"></i> Interpretação IA
+      <i class="ti ti-brain" style="font-size:16px"></i> Interpretação Clínica
     </button>
   </div>
   <div id="interpretacao-container"></div>
@@ -817,7 +817,7 @@ async function solicitarInterpretacao(pacId) {
     <div style="background:#fff;border:1px solid #bfdbfe;border-radius:10px;padding:18px;margin-bottom:16px">
       <div style="display:flex;align-items:center;gap:8px;margin-bottom:14px;padding-bottom:10px;border-bottom:1px solid #e5e7eb">
         <i class="ti ti-brain" style="font-size:20px;color:#185FA5"></i>
-        <span style="font-weight:600;font-size:14px;color:#185FA5">Interpretação Clínica — Gerada por IA</span>
+        <span style="font-weight:600;font-size:14px;color:#185FA5">Interpretação Clínica</span>
         <span style="font-size:11px;color:#6b7280;margin-left:auto">Revise com seu julgamento clínico</span>
       </div>
       <div style="font-size:14px;line-height:1.7;color:#374151">
@@ -981,7 +981,7 @@ function gerarPDF() {
     const interp = JSON.parse(localStorage.getItem('cefise_last_interpretacao') || '{}');
     if(interp.pacId === parseInt(pacId) && interp.texto) {
       if(y > 220) { doc.addPage(); y = 20; }
-      sec('Interpretação Clínica — IA');
+      sec('Interpretação Clínica');
       const textoLimpo = interp.texto.replace(/\*\*/g, '').replace(/#{1,3}\s?/g, '');
       const linhas = doc.splitTextToSize(textoLimpo, W - mg * 2);
       doc.setFontSize(9); doc.setTextColor(60,60,60);
